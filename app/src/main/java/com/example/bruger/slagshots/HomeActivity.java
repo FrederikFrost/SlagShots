@@ -1,5 +1,6 @@
 package com.example.bruger.slagshots;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
@@ -69,6 +70,8 @@ public class HomeActivity extends AppCompatActivity {
     }
 
     private void opretSpil(){
+      //  Intent intent = new Intent(HomeActivity.this,NewGameActivity.class);
+      //  startActivity(intent);
         finish();
     }
 
