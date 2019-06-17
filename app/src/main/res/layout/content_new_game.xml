@@ -12,13 +12,18 @@
     <Button
         android:id="@+id/button2"
         android:layout_width="159dp"
-        android:layout_height="77dp"
+        android:layout_height="0dp"
         android:text="AFBRYD SPIL"
         android:textSize="10pt"
         android:background="@android:color/holo_blue_light"
         android:textColor="#fffb1c"
-        tools:layout_editor_absoluteX="109dp"
-        tools:layout_editor_absoluteY="453dp" />
+        tools:layout_constraintRight_creator="1"
+        tools:layout_constraintBottom_creator="1"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintRight_toRightOf="parent"
+        tools:layout_constraintLeft_creator="1"
+        android:layout_marginBottom="37dp"
+        app:layout_constraintLeft_toLeftOf="parent" />
 
     <TextView
         android:id="@+id/textView"
@@ -33,9 +38,9 @@
         app:layout_constraintVertical_bias="0.094"
         app:layout_constraintRight_toRightOf="parent"
         app:layout_constraintLeft_toLeftOf="parent"
-        tools:layout_editor_absoluteY="47dp"
         app:layout_constraintHorizontal_bias="0.504"
-        tools:layout_editor_absoluteX="68dp" />
+        tools:layout_constraintRight_creator="1"
+        tools:layout_constraintLeft_creator="1" />
 
     <TextView
         android:id="@+id/textView3"
@@ -45,21 +50,29 @@
         android:textColor="#fffb1c"
         android:textStyle="bold"
         android:textSize="9pt"
-        tools:layout_editor_absoluteY="200dp"
         app:layout_constraintRight_toRightOf="parent"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintHorizontal_bias="0.513"
-        tools:layout_editor_absoluteX="74dp" />
+        tools:layout_constraintTop_creator="1"
+        tools:layout_constraintRight_creator="1"
+        android:layout_marginTop="200dp"
+        tools:layout_constraintLeft_creator="1"
+        app:layout_constraintTop_toTopOf="parent" />
 
     <Button
         android:id="@+id/button"
-        android:layout_width="159dp"
+        android:layout_width="0dp"
         android:layout_height="77dp"
         android:text="START SPIL"
         android:textSize="10pt"
         android:background="@android:color/holo_blue_light"
         android:textColor="#fffb1c"
-        tools:layout_editor_absoluteX="109dp"
-        tools:layout_editor_absoluteY="358dp" />
+        tools:layout_constraintRight_creator="1"
+        tools:layout_constraintBottom_creator="1"
+        app:layout_constraintBottom_toTopOf="@+id/button2"
+        app:layout_constraintRight_toRightOf="@+id/button2"
+        tools:layout_constraintLeft_creator="1"
+        android:layout_marginBottom="18dp"
+        app:layout_constraintLeft_toLeftOf="@+id/button2" />
 
 </android.support.constraint.ConstraintLayout>

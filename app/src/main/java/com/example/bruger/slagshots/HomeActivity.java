@@ -70,9 +70,8 @@ public class HomeActivity extends AppCompatActivity {
     }
 
     private void opretSpil(){
-      //  Intent intent = new Intent(HomeActivity.this,NewGameActivity.class);
-      //  startActivity(intent);
-        finish();
+      Intent intent = new Intent(HomeActivity.this,NewGameActivity.class);
+      startActivity(intent);
     }
 
     private void joinSpil(){
