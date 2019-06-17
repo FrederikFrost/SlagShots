@@ -10,7 +10,7 @@
     tools:showIn="@layout/activity_new_game">
 
     <Button
-        android:id="@+id/button2"
+        android:id="@+id/afbryd_spil_button"
         android:layout_width="159dp"
         android:layout_height="77dp"
         android:text="AFBRYD SPIL"
@@ -52,7 +52,7 @@
         tools:layout_editor_absoluteX="74dp" />
 
     <Button
-        android:id="@+id/button"
+        android:id="@+id/start_spil_button"
         android:layout_width="159dp"
         android:layout_height="77dp"
         android:text="START SPIL"
