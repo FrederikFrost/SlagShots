@@ -6,6 +6,7 @@ import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.View;
+import android.widget.Button;
 
 public class NewGameActivity extends AppCompatActivity {
 
@@ -13,17 +14,29 @@ public class NewGameActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_new_game);
-        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
-        setSupportActionBar(toolbar);
-
-        FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
-        fab.setOnClickListener(new View.OnClickListener() {
+        final Button startSpilButton = (Button) findViewById(R.id.start_spil_button);
+        startSpilButton.setOnClickListener(new View.OnClickListener() {
             @Override
-            public void onClick(View view) {
-                Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
-                        .setAction("Action", null).show();
+            public void onClick(View v) {
+                startSpil();
             }
         });
+        final Button afbrydSpilButton = (Button) findViewById(R.id.afbryd_spil_button);
+        afbrydSpilButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                afbrydSpil();
+            }
+        });
+
+        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+        setSupportActionBar(toolbar);
+    }
+    public void startSpil() {
+        finish();
+    }
+    public void afbrydSpil() {
+        finish();
     }
 
 }
