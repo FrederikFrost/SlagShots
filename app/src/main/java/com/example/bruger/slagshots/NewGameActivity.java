@@ -43,7 +43,7 @@ public class NewGameActivity extends AppCompatActivity {
 
     }
     public void startSpil() {
-        finish();
+        startActivity(new Intent(getApplicationContext(), GameActivity.class));
     }
     public void afbrydSpil() {
         finish();
