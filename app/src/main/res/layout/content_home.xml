@@ -11,39 +11,45 @@
 
     <Button
         android:id="@+id/opret_spil_button"
-        android:layout_width="170dp"
-        android:layout_height="89dp"
-        android:background="@android:color/holo_blue_light"
+        android:layout_width="147dp"
+        android:layout_height="73dp"
+        android:background="@drawable/button_border"
         android:text="@string/title_activity_new_game"
         android:textColor="#fffb1c"
         android:textStyle="bold"
-        android:textSize="25sp"
+        android:textSize="23sp"
+        android:textAlignment="center"
         tools:layout_constraintTop_creator="1"
         tools:layout_constraintRight_creator="1"
         app:layout_constraintRight_toRightOf="parent"
-        android:layout_marginTop="309dp"
+        android:layout_marginTop="315dp"
         tools:layout_constraintLeft_creator="1"
         app:layout_constraintLeft_toLeftOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintHorizontal_bias="0.502" />
 
     <Button
         android:id="@+id/join_spil_button"
-        android:layout_width="170dp"
-        android:layout_height="89dp"
-        android:background="@android:color/holo_blue_light"
+        android:layout_width="147dp"
+        android:layout_height="73dp"
+        android:background="@drawable/button_border"
         android:text="@string/title_activity_join_game1"
         android:textColor="#fffb1c"
         android:textStyle="bold"
-        android:textSize="25sp"
+        android:textSize="23sp"
+        android:textAlignment="center"
         tools:layout_constraintTop_creator="1"
         tools:layout_constraintRight_creator="1"
         app:layout_constraintRight_toRightOf="parent"
-        android:layout_marginTop="8dp"
-        app:layout_constraintTop_toBottomOf="@+id/opret_spil_button"
+        android:layout_marginTop="88dp"
         tools:layout_constraintLeft_creator="1"
-        app:layout_constraintLeft_toLeftOf="parent" />
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintHorizontal_bias="0.502"
+        app:layout_constraintVertical_bias="0.0"
+        app:layout_constraintTop_toTopOf="@+id/opret_spil_button" />
 
     <ImageView
+        android:contentDescription="@null"
         android:id="@+id/imageView2"
         android:layout_width="346dp"
         android:layout_height="286dp"
@@ -51,14 +57,48 @@
         tools:layout_constraintTop_creator="1"
         tools:layout_constraintRight_creator="1"
         tools:layout_constraintBottom_creator="1"
-        android:layout_marginStart="12dp"
         app:layout_constraintBottom_toBottomOf="parent"
         android:layout_marginEnd="12dp"
         app:layout_constraintRight_toRightOf="parent"
-        tools:layout_constraintLeft_creator="1"
         app:layout_constraintTop_toTopOf="parent"
         android:layout_marginRight="12dp"
         app:layout_constraintVertical_bias="0.021" />
+
+    <Button
+        android:id="@+id/skift_navn_button"
+        android:layout_width="147dp"
+        android:layout_height="73dp"
+        android:layout_marginBottom="5dp"
+        android:background="@drawable/button_border"
+        android:text="@string/title_activity_change_name"
+        android:textAlignment="center"
+        android:textColor="#fffb1c"
+        android:textSize="22sp"
+        android:textStyle="bold"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent"
+        tools:layout_constraintBottom_creator="1"
+        tools:layout_constraintLeft_creator="1"
+        tools:layout_constraintRight_creator="1"
+        app:layout_constraintHorizontal_bias="0.502" />
+
+    <TextView
+        android:id="@+id/nameView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textColor="#fffb1c"
+        android:textSize="18sp"
+        android:textStyle="bold"
+        android:text="@string/title_activity_username"
+        tools:layout_constraintTop_creator="1"
+        android:layout_marginStart="16dp"
+        tools:layout_constraintLeft_creator="1"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintTop_toTopOf="@+id/imageView2"
+        android:layout_marginLeft="16dp"
+        android:layout_marginTop="10dp">
+    </TextView>
 
 
 </android.support.constraint.ConstraintLayout>
