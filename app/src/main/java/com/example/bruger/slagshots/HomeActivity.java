@@ -83,23 +83,23 @@ public class HomeActivity extends AppCompatActivity {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
                         inputName = editText.getText().toString();
-                        if(inputName == null || inputName.trim().equals("")) {
+                        if(inputName != null && !inputName.trim().equals(("")) && inputName.length() < 14){
+                            dialog.dismiss();
+                            TextView nameView = (TextView) findViewById(R.id.nameView);
+                            nameView.setText(getResources().getString(R.string.title_activity_username) + "   " + inputName);
+                        }
+                        else if(inputName == null || inputName.trim().equals("")) {
                             Toast.makeText(getApplicationContext(), "Dit navn må ikke være tomt", Toast.LENGTH_SHORT).show();
                             showStartDialog();
                         }
-                        if(inputName.length() > 14) {
+                        else if (inputName.length() > 14) {
                             Toast.makeText(getApplicationContext(), "Dit navn er for langt", Toast.LENGTH_SHORT).show();
                             showStartDialog();
                         }
-                        dialog.dismiss();
-                        TextView nameView = (TextView) findViewById(R.id.nameView);
-                        nameView.setText(getResources().getString(R.string.title_activity_username) + "   " + inputName);
                     }
                 })
                 .create();
-
         dialog.getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_VISIBLE);
-
         dialog.show();
 
     }

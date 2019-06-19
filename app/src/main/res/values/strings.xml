@@ -14,4 +14,5 @@
     <string name ="title_activity_username">NAVN:</string>
     <string name ="title_activity_enter_code">INDTAST KODE&#8230;</string>
     <string name ="title_activity_change_name">SKIFT NAVN</string>
+    <string name ="title_activity_give_code">(GIV DENNE KODE TIL DIN VEN)</string>
 </resources>
