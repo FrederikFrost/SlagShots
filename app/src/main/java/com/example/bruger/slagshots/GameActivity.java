@@ -21,9 +21,11 @@ public class GameActivity extends AppCompatActivity {
         setContentView(R.layout.activity_game);
 
         GridView gridview1 = (GridView) findViewById(R.id.gridView1);
-        gridview1.setAdapter(new GridViewAdapter(this, model));
+        GridViewAdapter adapter = new GridViewAdapter(this, model);
+        gridview1.setAdapter(adapter);
 
-
+        GridView gridview2 = (GridView) findViewById(R.id.gridView2);
+        gridview2.setAdapter(adapter);
     }
 
 }

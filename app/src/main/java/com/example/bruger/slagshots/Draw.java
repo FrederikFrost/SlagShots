@@ -5,6 +5,12 @@ package com.example.bruger.slagshots;
  */
 
 public enum Draw {
-    BLANK, BLANK_HIT, OWN_SHIP,
-    OWN_SHIP_HIT, ENEMY_SHIP, ENEMY_SHIP_HIT
+    BLANK(0), BLANK_HIT(1), ENEMY_SHIP_HIT(2), OWN_SHIP(3);
+    private int value;
+
+    private Draw(int value) { this.value = value; }
+
+    public int getValue() {
+        return value;
+    }
 }

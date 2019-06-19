@@ -1,5 +1,6 @@
 package com.example.bruger.slagshots;
 
+import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
@@ -17,6 +18,7 @@ public class GridViewAdapter extends BaseAdapter {
     private Context mContext;
     private GameModel model;
 
+
     public GridViewAdapter(Context c, GameModel model) {
         mContext = c;
         this.model = model;
@@ -24,7 +26,7 @@ public class GridViewAdapter extends BaseAdapter {
 
     @Override
     public int getCount() {
-        return mThumbIds.length;
+        return model.getCount();
     }
 
     @Override
@@ -43,25 +45,20 @@ public class GridViewAdapter extends BaseAdapter {
 
         if (convertView == null) {
             imageView = new ImageView(mContext);
-            imageView.setLayoutParams(new GridView.LayoutParams(33, 33));
+            imageView.setLayoutParams(new GridView.LayoutParams(GridView.AUTO_FIT, 35));
             //imageView.setScaleType(ImageView.ScaleType.CENTER_CROP);
-            imageView.setPadding(1,2,1,2);
+            imageView.setPadding(0,2,0,2);
         }
         else
         {
             imageView = (ImageView) convertView;
         }
-        imageView.setImageResource(mThumbIds[position]);
+        imageView.setImageResource(mThumbIds[model.getView(position)]);
+        Log.i(model.TAG, "I got the image");
         return imageView;
     }
 
     public Integer[] mThumbIds = {
-            R.drawable.blank, R.drawable.blankhit,
-            R.drawable.enemyhit, R.drawable.own,
-            R.drawable.blank, R.drawable.blankhit,
-            R.drawable.enemyhit, R.drawable.own,
-            R.drawable.blank, R.drawable.blankhit,
-            R.drawable.enemyhit, R.drawable.own,
             R.drawable.blank, R.drawable.blankhit,
             R.drawable.enemyhit, R.drawable.own,
     };
