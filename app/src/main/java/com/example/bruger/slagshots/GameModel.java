@@ -6,5 +6,17 @@ package com.example.bruger.slagshots;
 
 public class GameModel {
 
+    public BoardField[] playerOne;
+    public BoardField[] playerTwo;
+
+    public GameModel() {
+        playerOne = new BoardField[100];
+        playerTwo = new BoardField[100];
+
+    }
+
+    public void executeShot(int player) {
+
+    }
 
 }
