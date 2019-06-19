@@ -8,6 +8,9 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.View;
 import android.widget.Button;
+import android.widget.TextView;
+
+import org.w3c.dom.Text;
 
 public class NewGameActivity extends AppCompatActivity {
 
@@ -32,6 +35,12 @@ public class NewGameActivity extends AppCompatActivity {
 
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
+        Intent intent = getIntent();
+        String inputName = intent.getStringExtra("inputName");
+        TextView textView = (TextView) findViewById(R.id.textView2);
+        textView.setText("1.      " + inputName + '\n' + "2.      " + "Frederik");
+
+
     }
     public void startSpil() {
         finish();
