@@ -1,19 +1,27 @@
 package com.example.bruger.slagshots;
 
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.SystemClock;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.WindowManager;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.TextView;
+import android.widget.Toast;
 
 public class HomeActivity extends AppCompatActivity {
     private SharedPreferences sharedPreferences;
@@ -52,11 +60,21 @@ public class HomeActivity extends AppCompatActivity {
             }
         });
 
+        Button skiftNavnButton = (Button) findViewById(R.id.skift_navn_button);
+        skiftNavnButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                skiftNavn();
+            }
+        });
+
 
     }
     private void showStartDialog(){
         final EditText editText = new EditText(HomeActivity.this);
-        new AlertDialog.Builder(this)
+        editText.setSingleLine(true);
+
+        AlertDialog dialog = new AlertDialog.Builder(this)
                 .setTitle("SlagShots!")
                 .setMessage('\n' + "Indtast dit navn")
                 .setView(editText)
@@ -65,10 +83,24 @@ public class HomeActivity extends AppCompatActivity {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
                         inputName = editText.getText().toString();
+                        if(inputName == null || inputName.trim().equals("")) {
+                            Toast.makeText(getApplicationContext(), "Dit navn må ikke være tomt", Toast.LENGTH_SHORT).show();
+                            showStartDialog();
+                        }
+                        if(inputName.length() > 14) {
+                            Toast.makeText(getApplicationContext(), "Dit navn er for langt", Toast.LENGTH_SHORT).show();
+                            showStartDialog();
+                        }
                         dialog.dismiss();
+                        TextView nameView = (TextView) findViewById(R.id.nameView);
+                        nameView.setText(getResources().getString(R.string.title_activity_username) + "   " + inputName);
                     }
                 })
-                .create().show();
+                .create();
+
+        dialog.getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_VISIBLE);
+
+        dialog.show();
 
     }
     @Override
@@ -103,5 +135,8 @@ public class HomeActivity extends AppCompatActivity {
         Intent intent = new Intent(HomeActivity.this, JoinGameActivity.class);
         startActivity(intent);
         finish();
+    }
+    private void skiftNavn(){
+        showStartDialog();
     }
 }
