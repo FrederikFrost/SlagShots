@@ -100,6 +100,8 @@ public class HomeActivity extends AppCompatActivity {
     }
 
     private void joinSpil(){
+        Intent intent = new Intent(HomeActivity.this, JoinGameActivity.class);
+        startActivity(intent);
         finish();
     }
 }

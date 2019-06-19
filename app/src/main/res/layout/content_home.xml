@@ -31,7 +31,7 @@
         android:layout_width="170dp"
         android:layout_height="89dp"
         android:background="@android:color/holo_blue_light"
-        android:text="@string/title_activity_join_game"
+        android:text="@string/title_activity_join_game1"
         android:textColor="#fffb1c"
         android:textStyle="bold"
         android:textSize="25sp"
