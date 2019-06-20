@@ -9,6 +9,7 @@ import android.support.v7.widget.Toolbar;
 import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import org.w3c.dom.Text;
 
@@ -21,6 +22,7 @@ import com.google.firebase.database.ValueEventListener;
 
 public class NewGameActivity extends AppCompatActivity {
     private FirebaseDatabase mDatabase;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -52,23 +54,24 @@ public class NewGameActivity extends AppCompatActivity {
         DatabaseReference mRef = mDatabase.getReference("message");
 
         mRef.setValue("Hello, World");
-        int counter;
 
         // Get a reference to our posts
         DatabaseReference counterRef = mDatabase.getReference("GameRoomCounter");
 
         // Attach a listener to read the data at our posts reference
-        counterRef.addValueEventListener(new ValueEventListener() {
+        counterRef.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
                 String counter = dataSnapshot.getValue().toString();
                 int counterInt = Integer.parseInt(counter);
                 counter = String.format("%06d", counterInt);
-                System.out.println(counter);
+
+
             }
 
             @Override
             public void onCancelled(DatabaseError databaseError) {
+                Toast.makeText(getApplicationContext(),"Couldn't get GameID", Toast.LENGTH_SHORT);
                 System.out.println("The read failed: " + databaseError.getCode());
             }
         });
