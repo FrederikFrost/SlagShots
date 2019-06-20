@@ -14,7 +14,13 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
 
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+
 public class JoinGameActivity extends AppCompatActivity {
+    private FirebaseDatabase mDatabase;
+    private DatabaseReference mGameRoom;
+    private int[] mGamePin = new int[1];
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -35,6 +41,7 @@ public class JoinGameActivity extends AppCompatActivity {
 
                 } else {
                     int gamepinNumber = Integer.parseInt(gamepin);
+
                    finish();
                 }
             }

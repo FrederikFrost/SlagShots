@@ -25,7 +25,7 @@ import com.google.firebase.database.ValueEventListener;
 public class NewGameActivity extends AppCompatActivity {
     private FirebaseDatabase mDatabase;
     private DatabaseReference mGameRoom;
-    private int mGamePin;
+    private int[] mGamePin = new int[1];
 
 
     @Override
@@ -51,7 +51,7 @@ public class NewGameActivity extends AppCompatActivity {
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
         Intent intent = getIntent();
-        String inputName = intent.getStringExtra("inputName");
+        final String inputName = intent.getStringExtra("inputName");
         TextView textView = (TextView) findViewById(R.id.textView2);
         textView.setText("1.      " + inputName + '\n' + "2.      " + "Frederik");
 
@@ -69,10 +69,14 @@ public class NewGameActivity extends AppCompatActivity {
             public void onDataChange(DataSnapshot dataSnapshot) {
                 String counter = dataSnapshot.getValue().toString();
                 int counterInt = Integer.parseInt(counter);
-                mGamePin = counterInt;
+                mGamePin[0] = counterInt;
                 counter = String.format("%06d", counterInt);
                 gamePinView.setText(counter);
                 counterRef.setValue(counterInt+1);
+
+                mGameRoom = mDatabase.getReference("GameRoom"+mGamePin[0]);
+                mGameRoom.child("PlayerOne").setValue(inputName);
+                mGameRoom.child("PlayerTwo").setValue(mGamePin[0]);
             }
 
             @Override
@@ -82,18 +86,26 @@ public class NewGameActivity extends AppCompatActivity {
             }
         });
 
-        final DatabaseReference mGameRoom = mDatabase.getReference("GameRoom"+mGamePin);
-        mGameRoom.child("PlayerOne").setValue(inputName);
-        mGameRoom.child("PlayerTwo").setValue(null);
 
 
+
+    }
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        lukGameRoom();
     }
 
     public void startSpil() {
         startActivity(new Intent(getApplicationContext(), GameActivity.class));
     }
     public void afbrydSpil() {
+        lukGameRoom();
         finish();
+    }
+
+    public void lukGameRoom(){
+        mGameRoom.setValue(null);
     }
 
 }
