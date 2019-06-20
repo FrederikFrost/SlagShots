@@ -1,5 +1,7 @@
 package com.example.bruger.slagshots;
 
+import android.util.Log;
+
 /**
  * Created by erknt on 19-06-2019.
  */
@@ -14,6 +16,7 @@ public class BoardField {
     }
 
     public void hit() {
+        Log.i("SKUD", "Jeg skydder!");
         isHit = true;
     }
 
