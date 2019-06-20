@@ -2,6 +2,7 @@ package com.example.bruger.slagshots;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.provider.ContactsContract;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
@@ -13,6 +14,7 @@ import android.widget.Toast;
 
 import org.w3c.dom.Text;
 
+import com.google.firebase.database.ChildEventListener;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
@@ -22,6 +24,8 @@ import com.google.firebase.database.ValueEventListener;
 
 public class NewGameActivity extends AppCompatActivity {
     private FirebaseDatabase mDatabase;
+    private DatabaseReference mGameRoom;
+    private int mGamePin;
 
 
     @Override
@@ -56,8 +60,8 @@ public class NewGameActivity extends AppCompatActivity {
 
         mRef.setValue("Hello, World");
 
-        // Get a reference to our posts
-        DatabaseReference counterRef = mDatabase.getReference("GameRoomCounter");
+        // Get a reference to the GameRoomCounter
+        final DatabaseReference counterRef = mDatabase.getReference("GameRoomCounter");
 
         // Attach a listener to read the data at our posts reference
         counterRef.addListenerForSingleValueEvent(new ValueEventListener() {
@@ -65,8 +69,10 @@ public class NewGameActivity extends AppCompatActivity {
             public void onDataChange(DataSnapshot dataSnapshot) {
                 String counter = dataSnapshot.getValue().toString();
                 int counterInt = Integer.parseInt(counter);
+                mGamePin = counterInt;
                 counter = String.format("%06d", counterInt);
                 gamePinView.setText(counter);
+                counterRef.setValue(counterInt+1);
             }
 
             @Override
@@ -76,8 +82,13 @@ public class NewGameActivity extends AppCompatActivity {
             }
         });
 
+        final DatabaseReference mGameRoom = mDatabase.getReference("GameRoom"+mGamePin);
+        mGameRoom.child("PlayerOne").setValue(inputName);
+        mGameRoom.child("PlayerTwo").setValue(null);
+
 
     }
+
     public void startSpil() {
         startActivity(new Intent(getApplicationContext(), GameActivity.class));
     }
