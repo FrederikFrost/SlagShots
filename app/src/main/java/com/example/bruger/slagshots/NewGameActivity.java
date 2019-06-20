@@ -3,6 +3,7 @@ package com.example.bruger.slagshots;
 import android.content.Intent;
 import android.os.Bundle;
 import android.provider.ContactsContract;
+import android.support.annotation.NonNull;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
@@ -25,7 +26,14 @@ import com.google.firebase.database.ValueEventListener;
 public class NewGameActivity extends AppCompatActivity {
     private FirebaseDatabase mDatabase;
     private DatabaseReference mGameRoom;
-    private int mGamePin;
+    private DatabaseReference mGameRoomsRoot;
+    private int[] mGamePin = new int[1];
+    private DatabaseReference mPlayerTwo;
+    private boolean PlayerTwoJoined = false;
+    private boolean spilStartet = false;
+    private boolean spilLukket;
+    private TextView mSpillerNavne;
+
 
 
     @Override
@@ -51,14 +59,16 @@ public class NewGameActivity extends AppCompatActivity {
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
         Intent intent = getIntent();
-        String inputName = intent.getStringExtra("inputName");
-        TextView textView = (TextView) findViewById(R.id.textView2);
-        textView.setText("1.    " + inputName + '\n' + "2.    " + "Frederik");
+        final String inputName = intent.getStringExtra("inputName");
+        mSpillerNavne = (TextView) findViewById(R.id.textView2);
+        opstilSpillerNavne(inputName, "Venter på Spiller");
 
         mDatabase = FirebaseDatabase.getInstance();
         DatabaseReference mRef = mDatabase.getReference("message");
 
         mRef.setValue("Hello, World");
+
+        mGameRoomsRoot = mDatabase.getReference("GameRooms");
 
         // Get a reference to the GameRoomCounter
         final DatabaseReference counterRef = mDatabase.getReference("GameRoomCounter");
@@ -69,31 +79,95 @@ public class NewGameActivity extends AppCompatActivity {
             public void onDataChange(DataSnapshot dataSnapshot) {
                 String counter = dataSnapshot.getValue().toString();
                 int counterInt = Integer.parseInt(counter);
-                mGamePin = counterInt;
+                mGamePin[0] = counterInt;
                 counter = String.format("%06d", counterInt);
                 gamePinView.setText(counter);
                 counterRef.setValue(counterInt+1);
+
+                mGameRoom = mGameRoomsRoot.child("GameRoom"+mGamePin[0]);
+                mGameRoom.child("PlayerOne").setValue(inputName);
+                mGameRoom.child("PlayerTwo").setValue(-1);
+
+                mPlayerTwo = mDatabase.getReference("GameRooms/GameRoom"+mGamePin[0]+"/PlayerTwo");
+                mPlayerTwo.addValueEventListener(new ValueEventListener() {
+                    @Override
+                    public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                        if(spilLukket){
+                            return;
+                        }
+                        String playerTwoName = dataSnapshot.getValue().toString();
+                        if(checkPlayerJoin(playerTwoName)){
+                            opstilSpillerNavne(inputName, playerTwoName);
+                            PlayerTwoJoined = true;
+                            Toast.makeText(getApplicationContext(),"En spiller har joinet", Toast.LENGTH_SHORT).show();
+                        } else {
+                            if(PlayerTwoJoined){
+                                Toast.makeText(getApplicationContext(),"En spiller har forladt GameRoom", Toast.LENGTH_SHORT).show();
+                            } else {PlayerTwoJoined = false;}
+
+                        }
+
+                    }
+
+                    @Override
+                    public void onCancelled(@NonNull DatabaseError databaseError) {
+
+                    }
+                });
             }
 
             @Override
             public void onCancelled(DatabaseError databaseError) {
-                Toast.makeText(getApplicationContext(),"Fejl med gamepin", Toast.LENGTH_SHORT);
+                Toast.makeText(getApplicationContext(),"Fejl med gamepin", Toast.LENGTH_SHORT).show();
                 System.out.println("The read failed: " + databaseError.getCode());
             }
         });
 
-        final DatabaseReference mGameRoom = mDatabase.getReference("GameRoom"+mGamePin);
-        mGameRoom.child("PlayerOne").setValue(inputName);
-        mGameRoom.child("PlayerTwo").setValue(null);
-
-
+    }
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        lukGameRoom();
     }
 
     public void startSpil() {
-        startActivity(new Intent(getApplicationContext(), GameActivity.class));
+        if(PlayerTwoJoined){
+            spilStartet = true;
+            startActivity(new Intent(getApplicationContext(), GameActivity.class));
+        } else {
+            Toast.makeText(getApplicationContext(),"Mangler en modstander", Toast.LENGTH_SHORT).show();
+        }
+
     }
     public void afbrydSpil() {
+        spilLukket = true;
+        lukGameRoom();
         finish();
+    }
+
+    public void lukGameRoom(){
+        if(!spilStartet){
+            mGameRoom.removeValue();
+        }
+    }
+
+    public void opstilSpillerNavne(String playerOne, String playerTwo){
+        if(!checkPlayerJoin(playerTwo)){
+            mSpillerNavne.setText("1.    " + playerOne + '\n' + "2.    " + "Venter på Spiller");
+        } else {
+            mSpillerNavne.setText("1.    " + playerOne + '\n' + "2.    " + playerTwo);
+        }
+
+    }
+
+    public boolean checkPlayerJoin(String playerTwo){
+        if(playerTwo.equals("-1")){
+            PlayerTwoJoined = false;
+            return false;
+        } else{
+            PlayerTwoJoined = true;
+            return true;
+        }
     }
 
 }

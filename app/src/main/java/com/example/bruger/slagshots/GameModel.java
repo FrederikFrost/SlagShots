@@ -20,10 +20,17 @@ public class GameModel {
         playerOne = new BoardField[100];
         createBoardField(playerOne);
         getTestBoard(playerOne);
+        playerTwo = new BoardField[100];
+        createBoardField(playerTwo);
+        getTestBoard2(playerTwo);
     }
 
     public int getCount() {
         return playerOne.length;
+    }
+
+    public BoardField getPos(int pos, boolean smallBoard) {
+        return smallBoard ? playerOne[pos]:playerTwo[pos];
     }
 
     public void createBoardField(BoardField[] board) {
@@ -41,9 +48,17 @@ public class GameModel {
         Log.i(TAG, "I inserted ship and shots");
     }
 
-    public int getView(int pos) {
+    public void getTestBoard2(BoardField[] board) {
+            board[55].hit();
+            board[12].setShip(true);
+            board[19].setShip(true);
+            board[19].hit();
+            Log.i(TAG, "I inserted ship and shots");
+    }
 
-        BoardField temp = playerOne[pos];
+    public int getView(int pos, boolean smallBoard) {
+
+        BoardField temp = smallBoard ? playerOne[pos]:playerTwo[pos];
         if (temp == null) {
             Log.i(TAG,DEBUGGER_STRING);
         }

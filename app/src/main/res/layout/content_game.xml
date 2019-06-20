@@ -37,10 +37,13 @@
             android:background="@android:color/black"
             android:gravity="center"
             android:numColumns="10"
-            android:padding="2dp"
+            android:padding="1dp"
+            android:horizontalSpacing="2dp"
+            android:verticalSpacing="2dp"
             android:layout_alignParentTop="true"
             android:layout_alignRight="@+id/gridView2"
-            android:layout_alignEnd="@+id/gridView2" />
+            android:layout_alignEnd="@+id/gridView2"
+            android:stretchMode="columnWidth" />
 
         <GridView
             android:id="@+id/gridView2"
@@ -50,10 +53,14 @@
             android:layout_centerHorizontal="true"
             android:layout_marginBottom="11dp"
             android:background="@android:color/black"
-            android:numColumns="10" />
+            android:numColumns="10"
+            android:padding="1dp"
+            android:horizontalSpacing="2dp"
+            android:verticalSpacing="2dp"
+            android:stretchMode="columnWidth" />
 
         <Button
-            android:id="@+id/button4"
+            android:id="@+id/fireShot"
             android:layout_width="140dp"
             android:layout_height="wrap_content"
             android:text="FIRE!"
