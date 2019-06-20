@@ -28,7 +28,7 @@ public class JoinGameActivity extends AppCompatActivity {
         setContentView(R.layout.activity_join_game);
         final EditText editText = (EditText) findViewById(R.id.editText);
         InputFilter[] filters = new InputFilter[1];
-        filters[0] = new InputFilter.LengthFilter(4);
+        filters[0] = new InputFilter.LengthFilter(6);
         editText.setFilters(filters);
         editText.setRawInputType(InputType.TYPE_CLASS_NUMBER | InputType.TYPE_NUMBER_FLAG_DECIMAL);
         Button findSpilButton = (Button) findViewById(R.id.find_game_button);
@@ -36,7 +36,7 @@ public class JoinGameActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 final String gamepin = editText.getText().toString();
-                if(gamepin.trim().equals("") || gamepin.length() != 4) {
+                if(gamepin.trim().equals("") || gamepin.length() != 6) {
                     Toast.makeText(getApplicationContext(), "Indtast venligst et gyldigt gamepin", Toast.LENGTH_SHORT).show();
 
                 } else {
