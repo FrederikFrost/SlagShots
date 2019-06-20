@@ -75,7 +75,7 @@ public class HomeActivity extends AppCompatActivity {
         final EditText editText = new EditText(HomeActivity.this);
         editText.setSingleLine(true); //kun en linje for navn
         InputFilter[] filters = new InputFilter[1];
-        filters[0] = new InputFilter.LengthFilter(14); //maksimal længde på navn er 15 characters
+        filters[0] = new InputFilter.LengthFilter(11); //maksimal længde på navn er 15 characters
         editText.setFilters(filters);
 
         AlertDialog dialog = new AlertDialog.Builder(this)

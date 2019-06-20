@@ -53,7 +53,7 @@ public class NewGameActivity extends AppCompatActivity {
         Intent intent = getIntent();
         String inputName = intent.getStringExtra("inputName");
         TextView textView = (TextView) findViewById(R.id.textView2);
-        textView.setText("1.      " + inputName + '\n' + "2.      " + "Frederik");
+        textView.setText("1.    " + inputName + '\n' + "2.    " + "Frederik");
 
         mDatabase = FirebaseDatabase.getInstance();
         DatabaseReference mRef = mDatabase.getReference("message");
