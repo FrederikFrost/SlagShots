@@ -25,7 +25,9 @@ import com.google.firebase.database.ValueEventListener;
 public class NewGameActivity extends AppCompatActivity {
     private FirebaseDatabase mDatabase;
     private DatabaseReference mGameRoom;
+    private DatabaseReference mGameRoomsRoot;
     private int[] mGamePin = new int[1];
+    private boolean spilStartet = false;
 
 
     @Override
@@ -60,6 +62,8 @@ public class NewGameActivity extends AppCompatActivity {
 
         mRef.setValue("Hello, World");
 
+        mGameRoomsRoot = mDatabase.getReference("GameRooms");
+
         // Get a reference to the GameRoomCounter
         final DatabaseReference counterRef = mDatabase.getReference("GameRoomCounter");
 
@@ -74,9 +78,9 @@ public class NewGameActivity extends AppCompatActivity {
                 gamePinView.setText(counter);
                 counterRef.setValue(counterInt+1);
 
-                mGameRoom = mDatabase.getReference("GameRoom"+mGamePin[0]);
+                mGameRoom = mGameRoomsRoot.child("GameRoom"+mGamePin[0]);
                 mGameRoom.child("PlayerOne").setValue(inputName);
-                mGameRoom.child("PlayerTwo").setValue(mGamePin[0]);
+
             }
 
             @Override
@@ -97,6 +101,7 @@ public class NewGameActivity extends AppCompatActivity {
     }
 
     public void startSpil() {
+        spilStartet = true;
         startActivity(new Intent(getApplicationContext(), GameActivity.class));
     }
     public void afbrydSpil() {
@@ -105,7 +110,9 @@ public class NewGameActivity extends AppCompatActivity {
     }
 
     public void lukGameRoom(){
-        mGameRoom.setValue(null);
+        if(!spilStartet){
+            mGameRoom.removeValue();
+        }
     }
 
 }

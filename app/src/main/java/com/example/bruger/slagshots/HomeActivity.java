@@ -134,8 +134,8 @@ public class HomeActivity extends AppCompatActivity {
 
     private void joinSpil(){
         Intent intent = new Intent(HomeActivity.this, JoinGameActivity.class);
+        intent.putExtra("inputName",inputName);
         startActivity(intent);
-        finish();
     }
     private void skiftNavn(){
         showStartDialog();
