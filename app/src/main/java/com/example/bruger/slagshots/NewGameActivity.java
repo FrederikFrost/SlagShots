@@ -9,6 +9,7 @@ import android.support.v7.widget.Toolbar;
 import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import org.w3c.dom.Text;
 
@@ -41,6 +42,7 @@ public class NewGameActivity extends AppCompatActivity {
             }
         });
 
+        final TextView gamePinView = (TextView) findViewById(R.id.gamepin);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
         Intent intent = getIntent();
@@ -58,17 +60,18 @@ public class NewGameActivity extends AppCompatActivity {
         DatabaseReference counterRef = mDatabase.getReference("GameRoomCounter");
 
         // Attach a listener to read the data at our posts reference
-        counterRef.addValueEventListener(new ValueEventListener() {
+        counterRef.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
                 String counter = dataSnapshot.getValue().toString();
                 int counterInt = Integer.parseInt(counter);
                 counter = String.format("%06d", counterInt);
-                System.out.println(counter);
+                gamePinView.setText(counter);
             }
 
             @Override
             public void onCancelled(DatabaseError databaseError) {
+                Toast.makeText(getApplicationContext(),"Fejl med gamepin", Toast.LENGTH_SHORT);
                 System.out.println("The read failed: " + databaseError.getCode());
             }
         });
