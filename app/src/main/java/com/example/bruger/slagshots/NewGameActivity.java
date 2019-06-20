@@ -43,6 +43,7 @@ public class NewGameActivity extends AppCompatActivity {
             }
         });
 
+        final TextView gamePinView = (TextView) findViewById(R.id.gamepin);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
         Intent intent = getIntent();
@@ -65,13 +66,12 @@ public class NewGameActivity extends AppCompatActivity {
                 String counter = dataSnapshot.getValue().toString();
                 int counterInt = Integer.parseInt(counter);
                 counter = String.format("%06d", counterInt);
-
-
+                gamePinView.setText(counter);
             }
 
             @Override
             public void onCancelled(DatabaseError databaseError) {
-                Toast.makeText(getApplicationContext(),"Couldn't get GameID", Toast.LENGTH_SHORT);
+                Toast.makeText(getApplicationContext(),"Fejl med gamepin", Toast.LENGTH_SHORT);
                 System.out.println("The read failed: " + databaseError.getCode());
             }
         });
