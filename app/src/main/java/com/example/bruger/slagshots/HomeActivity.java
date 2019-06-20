@@ -12,6 +12,7 @@ import android.support.design.widget.Snackbar;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.text.InputFilter;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.Menu;
@@ -72,29 +73,29 @@ public class HomeActivity extends AppCompatActivity {
     }
     private void showStartDialog(){
         final EditText editText = new EditText(HomeActivity.this);
-        editText.setSingleLine(true);
+        editText.setSingleLine(true); //kun en linje for navn
+        InputFilter[] filters = new InputFilter[1];
+        filters[0] = new InputFilter.LengthFilter(14); //maksimal længde på navn er 15 characters
+        editText.setFilters(filters);
 
         AlertDialog dialog = new AlertDialog.Builder(this)
                 .setTitle("SlagShots!")
                 .setMessage('\n' + "Indtast dit navn")
                 .setView(editText)
                 .setIcon(R.mipmap.ic_launcher)
+                .setCancelable(false)
                 .setPositiveButton("Bekræft", new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
                         inputName = editText.getText().toString();
-                        if(inputName != null && !inputName.trim().equals(("")) && inputName.length() < 14){
+                        if (inputName != null && !inputName.trim().equals((""))) {
                             dialog.dismiss();
                             TextView nameView = (TextView) findViewById(R.id.nameView);
                             nameView.setText(getResources().getString(R.string.title_activity_username) + "   " + inputName);
-                        }
-                        else if(inputName == null || inputName.trim().equals("")) {
+                        } else if (inputName == null || inputName.trim().equals("")) {
                             Toast.makeText(getApplicationContext(), "Dit navn må ikke være tomt", Toast.LENGTH_SHORT).show();
                             showStartDialog();
-                        }
-                        else if (inputName.length() > 14) {
-                            Toast.makeText(getApplicationContext(), "Dit navn er for langt", Toast.LENGTH_SHORT).show();
-                            showStartDialog();
+
                         }
                     }
                 })
