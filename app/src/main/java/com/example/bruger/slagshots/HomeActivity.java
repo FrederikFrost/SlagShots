@@ -23,6 +23,7 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
+import android.text.InputType;
 
 public class HomeActivity extends AppCompatActivity {
     private SharedPreferences sharedPreferences;
@@ -36,6 +37,7 @@ public class HomeActivity extends AppCompatActivity {
         setSupportActionBar(toolbar);
         sharedPreferences = getSharedPreferences("prefs",MODE_PRIVATE);
         showStartDialog();
+
 
        /* FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
         fab.setOnClickListener(new View.OnClickListener() {
@@ -74,6 +76,7 @@ public class HomeActivity extends AppCompatActivity {
     private void showStartDialog(){
         final EditText editText = new EditText(HomeActivity.this);
         editText.setSingleLine(true); //kun en linje for navn
+        editText.setRawInputType(InputType.TYPE_TEXT_VARIATION_PERSON_NAME);
         InputFilter[] filters = new InputFilter[1];
         filters[0] = new InputFilter.LengthFilter(11); //maksimal længde på navn er 15 characters
         editText.setFilters(filters);
@@ -127,9 +130,14 @@ public class HomeActivity extends AppCompatActivity {
     }
 
     private void opretSpil(){
-      Intent intent = new Intent(HomeActivity.this,NewGameActivity.class);
+        /*
+        Intent intent = new Intent(HomeActivity.this,NewGameActivity.class);
         intent.putExtra("inputName",inputName);
-      startActivity(intent);
+        startActivity(intent);
+        */
+        Intent prepGameIntent = new Intent(getApplicationContext(), PrepGameActivity.class);
+        prepGameIntent.putExtra("isPlayerOne",true);
+        startActivity(prepGameIntent);
     }
 
     private void joinSpil(){
