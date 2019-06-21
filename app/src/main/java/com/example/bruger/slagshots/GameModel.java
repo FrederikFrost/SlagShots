@@ -29,8 +29,17 @@ public class GameModel {
         return playerOne.length;
     }
 
-    public BoardField getPos(int pos, boolean smallBoard) {
-        return smallBoard ? playerOne[pos]:playerTwo[pos];
+    public BoardField getBoardfieldAtPosition(int pos, boolean isPlayerOne) {
+        return isPlayerOne ? playerOne[pos]:playerTwo[pos];
+    }
+
+    public void setBoardfieldAtPosition(BoardField boardField, int pos, boolean isPlayerOne) {
+        Log.i(TAG,"I set a boardfield");
+        if (isPlayerOne){
+            playerOne[pos] = boardField;
+        } else {
+            playerTwo[pos] = boardField;
+        }
     }
 
     public void createBoardField(BoardField[] board) {
@@ -56,24 +65,36 @@ public class GameModel {
             Log.i(TAG, "I inserted ship and shots");
     }
 
-    public int getView(int pos, boolean smallBoard) {
+    public int getView(int pos, boolean isPlayerOne) {
 
-        BoardField temp = smallBoard ? playerOne[pos]:playerTwo[pos];
-        if (temp == null) {
+        BoardField boardField = isPlayerOne ? playerOne[pos]:playerTwo[pos];
+        if (boardField == null) {
             Log.i(TAG,DEBUGGER_STRING);
         }
-        if (!temp.getHit()) {
-            if (!temp.getShip()) {
+        if (!boardField.getHit()) {
+            if (!boardField.getShip()) {
                 return Draw.BLANK.getValue();
             } else {
                 return Draw.OWN_SHIP.getValue();
             }
         } else {
-            if (!temp.getShip()) {
+            if (!boardField.getShip()) {
                 return Draw.BLANK_HIT.getValue();
             } else {
                 return Draw.ENEMY_SHIP_HIT.getValue();
             }
         }
     }
+
+    public void printBoard(){
+        for (int i=0; i<100; i=i+10){
+            String msg = "";
+            for (int e=0; e<10; e++){
+                msg = msg + (playerTwo[i+e].toString()+" ");
+            }
+
+            Log.i("Oliver",msg);
+        }
+    }
+
 }
