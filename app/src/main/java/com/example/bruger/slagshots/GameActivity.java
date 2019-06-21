@@ -40,7 +40,7 @@ public class GameActivity extends AppCompatActivity {
             @Override
             public void onClick(View view) {
                 if (!positionSelected) {
-                    Toast.makeText(getApplicationContext(),"No position marked for attack.", Toast.LENGTH_LONG).show();
+                    Toast.makeText(getApplicationContext(),"Intet felt valgt at skyde på", Toast.LENGTH_LONG).show();
 
                 } else {
                     Log.i("SKUD", "Jeg affryrer skud.");

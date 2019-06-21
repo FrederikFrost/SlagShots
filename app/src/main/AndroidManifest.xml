@@ -33,7 +33,12 @@
         <activity
             android:name=".JoinGameActivity"
             android:label="@string/title_activity_join_game"
+
             android:theme="@style/AppTheme.NoActionBar"></activity>
     </application>
-
+    <supports-screens
+        android:smallScreens="true"
+        android:normalScreens="true"
+        android:largeScreens="true"
+        android:anyDensity="true" />
 </manifest>
