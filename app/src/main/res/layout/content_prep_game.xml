@@ -4,17 +4,22 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:background="#3e7fe8"
     app:layout_behavior="@string/appbar_scrolling_view_behavior"
     tools:context=".PrepGameActivity"
-    tools:showIn="@layout/activity_prep_game"
-    android:background="#3e7fe8" >
+    tools:showIn="@layout/activity_prep_game">
 
     <Button
         android:id="@+id/readyButton"
         android:layout_width="140dp"
         android:layout_height="wrap_content"
         android:layout_marginBottom="4dp"
+        android:background="@drawable/button_border"
         android:text="Klar!"
+        android:textAlignment="center"
+        android:textColor="#fffb1c"
+        android:textSize="18sp"
+        android:textStyle="bold"
         app:layout_constraintBottom_toTopOf="@+id/gridView3"
         app:layout_constraintEnd_toEndOf="@+id/gridView3"
         app:layout_constraintHorizontal_bias="1.0"
@@ -44,5 +49,25 @@
         app:layout_constraintVertical_bias="0.85">
 
     </GridView>
+
+    <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+        android:id="@+id/linearLayout"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="62dp"
+        android:orientation="horizontal"
+        android:padding="10dp"
+        app:layout_constraintBottom_toTopOf="@+id/instructions_button"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent">
+
+        <TextView
+            android:id="@+id/txtCustomToast"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:gravity="center_horizontal" />
+    </LinearLayout>
 
 </android.support.constraint.ConstraintLayout>
