@@ -45,6 +45,7 @@ public class GameActivity extends AppCompatActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+
         super.onCreate(savedInstanceState);
         model = new GameModel();
         setContentView(R.layout.activity_game);
@@ -54,7 +55,7 @@ public class GameActivity extends AppCompatActivity {
         gameroomName = intent.getStringExtra("GameroomName");
         isPlayerOne = intent.getBooleanExtra("isPlayerOne",false);
         Log.i("Oliver","Got the following string from intent:"+gameroomName);
-        Log.i("Oliver", "I am player" + (isPlayerOne? 1:2));
+        Log.i("Oliver","I am player " + (isPlayerOne ?1:2));
 
         //get ref to database
         mDatabaseRoot = FirebaseDatabase.getInstance();
@@ -249,30 +250,30 @@ public class GameActivity extends AppCompatActivity {
     }
 
     private int checkGoal(){
-        //check if a player has lost. 0 is that none has lost, 1 is player one has lost and 2 is player two has lost.
-        boolean oneHasLost = true;
+        //check if a player has won. 0 is that no one has won, 1 is player one has won and 2 is player two has won.
+        boolean oneHasWon = true;
         for (BoardField bf: model.playerOne){
             if (bf.getShip() && !bf.getHit()){
-                oneHasLost = false;
+                oneHasWon = false;
                 break;
             }
         }
 
-        if (oneHasLost){
-            Log.i("Oliver", "PlayerOne has lost");
+        if (oneHasWon){
+            Log.i("Oliver","Player " + (isPlayerOne ?1:2) + " has won");
             return 1;
         }
 
-        boolean twoHasLost = true;
+        boolean twoHasWon = true;
         for (BoardField bf: model.playerTwo){
             if (bf.getShip() && !bf.getHit()){
-                twoHasLost = false;
+                twoHasWon = false;
                 break;
             }
         }
 
-        if (twoHasLost){
-            Log.i("Oliver", "PlayerTwo has lost");
+        if (twoHasWon){
+            Log.i("Oliver","Player " + (isPlayerOne ?1:2) + " has won");
             return 2;
         }
 
