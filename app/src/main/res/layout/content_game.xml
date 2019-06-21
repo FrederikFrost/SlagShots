@@ -63,7 +63,7 @@
             android:id="@+id/fireShot"
             android:layout_width="140dp"
             android:layout_height="wrap_content"
-            android:text="FIRE!"
+            android:text="AFFYR SKUD!"
             android:layout_alignBottom="@+id/gridView1"
             android:layout_alignLeft="@+id/gridView2"
             android:layout_alignStart="@+id/gridView2" />

@@ -155,11 +155,11 @@ public class GameActivity extends AppCompatActivity {
 
                 //check that it is the players turn
                 if (!isPlayersTurn(isPlayerOne)){
-                    Toast.makeText(getApplicationContext(),"Not your turn. Please wait.", Toast.LENGTH_LONG).show();
+                    Toast.makeText(getApplicationContext(),"Det er ikke din tur - vent venligst", Toast.LENGTH_LONG).show();
                 } else if (!positionSelected) {
-                    Toast.makeText(getApplicationContext(),"No position marked for attack.", Toast.LENGTH_LONG).show();
+                    Toast.makeText(getApplicationContext(),"Der er ikke valgt et felt at skyde på", Toast.LENGTH_LONG).show();
                 } else {
-                    Log.i("SKUD", "Jeg affryrer skud.");
+                    Log.i("SKUD", "Jeg affyrer skud.");
 
                     //updates the board
                     model.getBoardfieldAtPosition(adapter.getSelectedPosition(), isPlayerOne).hit();

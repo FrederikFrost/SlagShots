@@ -56,7 +56,7 @@ public class NewGameActivity extends AppCompatActivity {
         Intent intent = getIntent();
         final String inputName = intent.getStringExtra("inputName");
         mSpillerNavne = (TextView) findViewById(R.id.textView2);
-        opstilSpillerNavne(inputName, "Venter på Spiller");
+        opstilSpillerNavne(inputName, "Venter på spiller");
 
         mDatabase = FirebaseDatabase.getInstance();
         mGameRoomsRoot = mDatabase.getReference("GameRooms");
@@ -121,7 +121,7 @@ public class NewGameActivity extends AppCompatActivity {
     @Override
     public void onDestroy() {
         super.onDestroy();
-        lukGameRoom();
+        afbrydSpil();
     }
 
     public void startSpil() {
@@ -142,6 +142,7 @@ public class NewGameActivity extends AppCompatActivity {
         finish();
     }
 
+
     public void lukGameRoom(){
         if(!spilStartet){
             mGameRoom.removeValue();
@@ -150,7 +151,7 @@ public class NewGameActivity extends AppCompatActivity {
 
     public void opstilSpillerNavne(String playerOne, String playerTwo){
         if(!checkPlayerJoin(playerTwo)){
-            mSpillerNavne.setText("1.    " + playerOne + '\n' + "2.    " + "Venter på Spiller");
+            mSpillerNavne.setText("1.    " + playerOne + '\n' + "2.    " + "Venter på spiller");
         } else {
             mSpillerNavne.setText("1.    " + playerOne + '\n' + "2.    " + playerTwo);
         }

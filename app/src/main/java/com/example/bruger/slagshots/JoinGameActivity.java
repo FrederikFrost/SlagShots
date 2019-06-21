@@ -53,6 +53,7 @@ public class JoinGameActivity extends AppCompatActivity {
                     Toast.makeText(getApplicationContext(), "Indtast venligst et gyldigt gamepin", Toast.LENGTH_SHORT).show();
 
                 } else {
+                    Toast.makeText(getApplicationContext(), "Finder spil med gamepin " + gamePinChecker, Toast.LENGTH_SHORT).show();
                     gamePin = formatPin(editText.getText().toString());
                     mGamePin[0] = Integer.parseInt(gamePin);
 
@@ -66,6 +67,7 @@ public class JoinGameActivity extends AppCompatActivity {
                             } else{
                                 mGameRoom = mGameRoomsRoot.child("GameRoom"+mGamePin[0]);
                                 mGameRoom.child("PlayerTwo").setValue(inputName);
+                                Toast.makeText(getApplicationContext(), "Dit spil blev fundet. Held og lykke matros!", Toast.LENGTH_LONG).show();
                             }
                         }
 
