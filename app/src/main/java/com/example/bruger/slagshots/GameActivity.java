@@ -73,6 +73,33 @@ public class GameActivity extends AppCompatActivity {
         mGameroom.child("PlayerOnesBoard").setValue(convertFromBoardFieldToArrayList(model.playerTwoBoard));
         mGameroom.child("PlayerTwosBoard").setValue(convertFromBoardFieldToArrayList(model.playerOneBoard));
 
+        final String[] playerOneName = new String[1];
+        final String[] playerTwoName = new String[1];
+
+        mGameroom.child("PlayerOne").addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                playerOneName[0] = dataSnapshot.getValue().toString();
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+
+            }
+        });
+
+        mGameroom.child("PlayerTwo").addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                playerTwoName[0] = dataSnapshot.getValue().toString();
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+
+            }
+        });
+
         //create listener that updates player one's board
         mGameroom.child("PlayerOnesBoard").addValueEventListener(new ValueEventListener() {
             @Override
@@ -137,18 +164,21 @@ public class GameActivity extends AppCompatActivity {
                 if (checkGoal != 0){
                     if (checkGoal == 2){
                         //two has won
-                        Toast.makeText(getApplicationContext(),"Player two has won!", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(getApplicationContext(),playerTwoName[0]+" har vundet!!", Toast.LENGTH_SHORT).show();
                     } else if (checkGoal == 1){
                         //one has won
-                        Toast.makeText(getApplicationContext(),"Player one has won!", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(getApplicationContext(), playerOneName[0] +" har vundet!!", Toast.LENGTH_SHORT).show();
                     }
                     gameDone = true;
                     mGameroom.removeValue();
                     finish();
-                }
-                if(isPlayersTurn(isPlayerOne)){
+                } else if(isPlayersTurn(isPlayerOne)){
                     Toast.makeText(getApplicationContext(),"Det er din tur!", Toast.LENGTH_SHORT).show();
                 }
+
+
+
+
                 Log.i("Oliver","We got the turn value "+turn);
             }
 
