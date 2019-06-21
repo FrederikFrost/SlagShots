@@ -35,6 +35,7 @@ public class HomeActivity extends AppCompatActivity {
         setContentView(R.layout.activity_home);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
+        sharedPreferences = getSharedPreferences("prefs",MODE_PRIVATE);
         showStartDialog();
 
         Button opretSpilButton = (Button) findViewById(R.id.opret_spil_button);
@@ -88,6 +89,7 @@ public class HomeActivity extends AppCompatActivity {
                         } else if (inputName == null || inputName.trim().equals("") ||  inputName.substring(0,1).equals("")) {
                             Toast.makeText(getApplicationContext(), "Dit navn må ikke være tomt eller starte med et mellemrum", Toast.LENGTH_SHORT).show();
                             showStartDialog();
+
                         }
                     }
                 })
@@ -119,9 +121,14 @@ public class HomeActivity extends AppCompatActivity {
     }
 
     private void opretSpil(){
-      Intent intent = new Intent(HomeActivity.this,NewGameActivity.class);
+        /*
+        Intent intent = new Intent(HomeActivity.this,NewGameActivity.class);
         intent.putExtra("inputName",inputName);
-      startActivity(intent);
+        startActivity(intent);
+        */
+        Intent prepGameIntent = new Intent(getApplicationContext(), PrepGameActivity.class);
+        prepGameIntent.putExtra("isPlayerOne",true);
+        startActivity(prepGameIntent);
     }
 
     private void joinSpil(){

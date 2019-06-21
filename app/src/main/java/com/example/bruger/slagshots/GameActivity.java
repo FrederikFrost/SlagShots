@@ -42,6 +42,8 @@ public class GameActivity extends AppCompatActivity {
 
     private int turn = 1;
 
+    private boolean gameDone = false;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -71,6 +73,9 @@ public class GameActivity extends AppCompatActivity {
         mGameroom.child("Turn").addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                if(gameDone){
+                    return;
+                }
                 //recieve turn variable
                 turn = Integer.parseInt(dataSnapshot.getValue().toString());
 
@@ -89,6 +94,8 @@ public class GameActivity extends AppCompatActivity {
                         //two has lost
                         Toast.makeText(getApplicationContext(),"Player one has won!", Toast.LENGTH_SHORT).show();
                     }
+                    gameDone = true;
+                    mGameroom.removeValue();
                     finish();
                 }
 
@@ -105,6 +112,9 @@ public class GameActivity extends AppCompatActivity {
         mGameroom.child("PlayerOnesBoard").addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                if(gameDone){
+                    return;
+                }
                 //converts data back to BoardField array
                 GenericTypeIndicator<ArrayList<Integer>> t = new GenericTypeIndicator<ArrayList<Integer>>() {};
                 ArrayList<Integer> temp = dataSnapshot.getValue(t);
@@ -124,6 +134,9 @@ public class GameActivity extends AppCompatActivity {
         mGameroom.child("PlayerTwosBoard").addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                if(gameDone){
+                    return;
+                }
                 //converts data back to BoardField array
                 GenericTypeIndicator<ArrayList<Integer>> t = new GenericTypeIndicator<ArrayList<Integer>>() {};
                 ArrayList<Integer> temp = dataSnapshot.getValue(t);
