@@ -19,10 +19,10 @@ public class GameModel {
         Log.i(TAG, "I made it in the GameModel constructer");
         playerOne = new BoardField[100];
         createBoardField(playerOne);
-        getTestBoard(playerOne);
+        //getTestBoard(playerOne);
         playerTwo = new BoardField[100];
         createBoardField(playerTwo);
-        getTestBoard2(playerTwo);
+        //getTestBoard2(playerTwo);
     }
 
     public int getCount() {
