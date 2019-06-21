@@ -13,6 +13,7 @@ import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.text.InputFilter;
+import android.text.InputType;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.Menu;
@@ -34,17 +35,8 @@ public class HomeActivity extends AppCompatActivity {
         setContentView(R.layout.activity_home);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
-        sharedPreferences = getSharedPreferences("prefs",MODE_PRIVATE);
         showStartDialog();
 
-       /* FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
-        fab.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
-                        .setAction("Action", null).show();
-            }
-        }); */
         Button opretSpilButton = (Button) findViewById(R.id.opret_spil_button);
         opretSpilButton.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -74,6 +66,7 @@ public class HomeActivity extends AppCompatActivity {
     private void showStartDialog(){
         final EditText editText = new EditText(HomeActivity.this);
         editText.setSingleLine(true); //kun en linje for navn
+        editText.setRawInputType(InputType.TYPE_TEXT_VARIATION_PERSON_NAME);
         InputFilter[] filters = new InputFilter[1];
         filters[0] = new InputFilter.LengthFilter(11); //maksimal længde på navn er 15 characters
         editText.setFilters(filters);
@@ -92,10 +85,9 @@ public class HomeActivity extends AppCompatActivity {
                             dialog.dismiss();
                             TextView nameView = (TextView) findViewById(R.id.nameView);
                             nameView.setText(getResources().getString(R.string.title_activity_username) + "   " + inputName);
-                        } else if (inputName == null || inputName.trim().equals("")) {
-                            Toast.makeText(getApplicationContext(), "Dit navn må ikke være tomt", Toast.LENGTH_SHORT).show();
+                        } else if (inputName == null || inputName.trim().equals("") ||  inputName.substring(0,1).equals("")) {
+                            Toast.makeText(getApplicationContext(), "Dit navn må ikke være tomt eller starte med et mellemrum", Toast.LENGTH_SHORT).show();
                             showStartDialog();
-
                         }
                     }
                 })
