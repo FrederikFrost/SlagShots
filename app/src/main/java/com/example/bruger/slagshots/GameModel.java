@@ -9,36 +9,36 @@ import android.util.Log;
 
 public class GameModel {
 
-    public BoardField[] playerOne;
-    public BoardField[] playerTwo;
+    public BoardField[] playerTwoBoard;
+    public BoardField[] playerOneBoard;
     public final String TAG = "DEBUGGER";
     public final String DEBUGGER_STRING = "This object is null!";
 
 
     public GameModel() {
         Log.i(TAG, "I made it in the GameModel constructer");
-        playerOne = new BoardField[100];
-        createBoardField(playerOne);
-        getTestBoard(playerOne);
-        playerTwo = new BoardField[100];
-        createBoardField(playerTwo);
-        getTestBoard2(playerTwo);
+        playerTwoBoard = new BoardField[100];
+        createBoardField(playerTwoBoard);
+        getTestBoard(playerTwoBoard);
+        playerOneBoard = new BoardField[100];
+        createBoardField(playerOneBoard);
+        getTestBoard2(playerOneBoard);
     }
 
     public int getCount() {
-        return playerOne.length;
+        return playerTwoBoard.length;
     }
 
     public BoardField getBoardfieldAtPosition(int pos, boolean isPlayerOne) {
-        return isPlayerOne ? playerOne[pos]:playerTwo[pos];
+        return isPlayerOne ? playerTwoBoard[pos]: playerOneBoard[pos];
     }
 
     public void setBoardfieldAtPosition(BoardField boardField, int pos, boolean isPlayerOne) {
         Log.i(TAG,"I set a boardfield");
         if (isPlayerOne){
-            playerOne[pos] = boardField;
+            playerTwoBoard[pos] = boardField;
         } else {
-            playerTwo[pos] = boardField;
+            playerOneBoard[pos] = boardField;
         }
     }
 
@@ -67,7 +67,7 @@ public class GameModel {
 
     public int getView(int pos, boolean isPlayerOne) {
 
-        BoardField boardField = isPlayerOne ? playerOne[pos]:playerTwo[pos];
+        BoardField boardField = isPlayerOne ? playerTwoBoard[pos]: playerOneBoard[pos];
         if (boardField == null) {
             Log.i(TAG,DEBUGGER_STRING);
         }
@@ -90,7 +90,7 @@ public class GameModel {
         for (int i=0; i<100; i=i+10){
             String msg = "";
             for (int e=0; e<10; e++){
-                msg = msg + (playerTwo[i+e].toString()+" ");
+                msg = msg + (playerOneBoard[i+e].toString()+" ");
             }
 
             Log.i("Oliver",msg);

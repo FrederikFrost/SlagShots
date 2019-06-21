@@ -39,6 +39,15 @@ public class HomeActivity extends AppCompatActivity {
         sharedPreferences = getSharedPreferences("prefs",MODE_PRIVATE);
         showStartDialog();
 
+
+       /* FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
+        fab.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
+                        .setAction("Action", null).show();
+            }
+        }); */
         Button opretSpilButton = (Button) findViewById(R.id.opret_spil_button);
         opretSpilButton.setOnClickListener(new View.OnClickListener() {
             @Override
