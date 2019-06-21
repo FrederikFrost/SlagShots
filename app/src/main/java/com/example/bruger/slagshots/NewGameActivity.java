@@ -85,7 +85,8 @@ public class NewGameActivity extends AppCompatActivity {
                 mPlayerTwo.addValueEventListener(new ValueEventListener() {
                     @Override
                     public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                        if(spilLukket){
+                        if(spilLukket || spilStartet){
+                            finish();
                             return;
                         }
                         String playerTwoName = dataSnapshot.getValue().toString();
