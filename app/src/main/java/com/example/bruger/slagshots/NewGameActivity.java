@@ -131,10 +131,12 @@ public class NewGameActivity extends AppCompatActivity {
     public void startSpil() {
         if(PlayerTwoJoined){
             spilStartet = true;
+
             Intent newGameIntent = new Intent(getApplicationContext(), GameActivity.class);
             newGameIntent.putExtra("GameroomName","GameRoom"+mGamePin[0]);
             newGameIntent.putExtra("isPlayerOne",true);
             startActivity(newGameIntent);
+
         } else {
             Toast.makeText(getApplicationContext(),"Mangler en modstander", Toast.LENGTH_SHORT).show();
         }

@@ -10,9 +10,10 @@
     <string name="title_activity_gamepin2">GAMEPIN</string>
     <string name="title_activity_game">GameActivity</string>
     <string name="title_activity_join_game">JoinGameActivity</string>
-    <string name ="title_activity_find_game">FIND SPIL</string>
-    <string name ="title_activity_username">NAVN:</string>
-    <string name ="title_activity_enter_code">INDTAST KODE&#8230;</string>
-    <string name ="title_activity_change_name">SKIFT NAVN</string>
-    <string name ="title_activity_give_code">(GIV DENNE KODE TIL DIN VEN)</string>
+    <string name="title_activity_find_game">FIND SPIL</string>
+    <string name="title_activity_username">NAVN:</string>
+    <string name="title_activity_enter_code">INDTAST KODE&#8230;</string>
+    <string name="title_activity_change_name">SKIFT NAVN</string>
+    <string name="title_activity_give_code">(GIV DENNE KODE TIL DIN VEN)</string>
+    <string name="title_activity_prep_game">PrepGameActivity</string>
 </resources>
