@@ -54,6 +54,7 @@ public class GameActivity extends AppCompatActivity {
         gameroomName = intent.getStringExtra("GameroomName");
         isPlayerOne = intent.getBooleanExtra("isPlayerOne",false);
         Log.i("Oliver","Got the following string from intent:"+gameroomName);
+        Log.i("Oliver", "I am player" + (isPlayerOne? 1:2));
 
         //get ref to database
         mDatabaseRoot = FirebaseDatabase.getInstance();
@@ -80,10 +81,10 @@ public class GameActivity extends AppCompatActivity {
                 //check for goal state
                 int checkGoal = checkGoal();
                 if (checkGoal != 0){
-                    if (checkGoal == 1){
+                    if (checkGoal == 2){
                         //one has lost
                         Toast.makeText(getApplicationContext(),"Player two has won!", Toast.LENGTH_SHORT).show();
-                    } else if (checkGoal == 2){
+                    } else if (checkGoal == 1){
                         //two has lost
                         Toast.makeText(getApplicationContext(),"Player one has won!", Toast.LENGTH_SHORT).show();
                     }
@@ -258,6 +259,7 @@ public class GameActivity extends AppCompatActivity {
         }
 
         if (oneHasLost){
+            Log.i("Oliver", "PlayerOne has lost");
             return 1;
         }
 
@@ -270,6 +272,7 @@ public class GameActivity extends AppCompatActivity {
         }
 
         if (twoHasLost){
+            Log.i("Oliver", "PlayerTwo has lost");
             return 2;
         }
 
