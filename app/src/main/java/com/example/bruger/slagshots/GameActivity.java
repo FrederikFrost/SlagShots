@@ -146,7 +146,9 @@ public class GameActivity extends AppCompatActivity {
                     mGameroom.removeValue();
                     finish();
                 }
-
+                if(isPlayersTurn(isPlayerOne)){
+                    Toast.makeText(getApplicationContext(),"Det er din tur!", Toast.LENGTH_SHORT).show();
+                }
                 Log.i("Oliver","We got the turn value "+turn);
             }
 
