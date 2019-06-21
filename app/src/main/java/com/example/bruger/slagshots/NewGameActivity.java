@@ -22,6 +22,8 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
+import static java.lang.Boolean.FALSE;
+
 
 public class NewGameActivity extends AppCompatActivity {
     private FirebaseDatabase mDatabase;
@@ -80,6 +82,7 @@ public class NewGameActivity extends AppCompatActivity {
                 mGameRoom = mGameRoomsRoot.child("GameRoom"+mGamePin[0]);
                 mGameRoom.child("PlayerOne").setValue(inputName);
                 mGameRoom.child("PlayerTwo").setValue(-1);
+                mGameRoom.child("PlayerLeftGame").setValue("FALSE");
 
                 mPlayerTwo = mDatabase.getReference("GameRooms/GameRoom"+mGamePin[0]+"/PlayerTwo");
                 mPlayerTwo.addValueEventListener(new ValueEventListener() {

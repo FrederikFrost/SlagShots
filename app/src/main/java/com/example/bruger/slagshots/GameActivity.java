@@ -26,6 +26,9 @@ import com.google.firebase.database.ValueEventListener;
 import java.util.ArrayList;
 import java.util.Arrays;
 
+import static java.lang.Boolean.FALSE;
+import static java.lang.Boolean.TRUE;
+
 
 public class GameActivity extends AppCompatActivity {
 
@@ -43,6 +46,7 @@ public class GameActivity extends AppCompatActivity {
     private int turn = 1;
 
     private boolean gameDone = false;
+    private boolean playerLeftGame = false;
 
 
     @Override
@@ -73,7 +77,7 @@ public class GameActivity extends AppCompatActivity {
         mGameroom.child("Turn").addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                if(gameDone){
+                if(gameDone || playerLeftGame){
                     return;
                 }
                 //recieve turn variable
@@ -89,10 +93,10 @@ public class GameActivity extends AppCompatActivity {
                 if (checkGoal != 0){
                     if (checkGoal == 2){
                         //one has lost
-                        Toast.makeText(getApplicationContext(),"Player two has won!", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(getApplicationContext(),"Spiller 2 har vundet!", Toast.LENGTH_SHORT).show();
                     } else if (checkGoal == 1){
                         //two has lost
-                        Toast.makeText(getApplicationContext(),"Player one has won!", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(getApplicationContext(),"Spiller 1 har vundet!", Toast.LENGTH_SHORT).show();
                     }
                     gameDone = true;
                     mGameroom.removeValue();
@@ -112,7 +116,7 @@ public class GameActivity extends AppCompatActivity {
         mGameroom.child("PlayerOnesBoard").addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                if(gameDone){
+                if(gameDone || playerLeftGame){
                     return;
                 }
                 //converts data back to BoardField array
@@ -134,7 +138,7 @@ public class GameActivity extends AppCompatActivity {
         mGameroom.child("PlayerTwosBoard").addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                if(gameDone){
+                if(gameDone || playerLeftGame){
                     return;
                 }
                 //converts data back to BoardField array
@@ -144,6 +148,29 @@ public class GameActivity extends AppCompatActivity {
                 model.playerTwo = convertFromArrayListToBoardField(temp);
 
                 Log.i("Oliver","Updated model.playerTwo");
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+
+            }
+        });
+
+        //Create listener that checks if a player left the game.
+        mGameroom.child("PlayerLeftGame").addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                if(playerLeftGame || gameDone){
+                    finish();
+                } else if (dataSnapshot.exists() && dataSnapshot.getValue().toString().equals("TRUE")){
+                    playerLeftGame = true;
+                    Toast.makeText(getApplicationContext(),"Din modstander har forladt spillet. Lukker ned.", Toast.LENGTH_LONG).show();
+                    mGameroom.removeValue();
+                    finish();
+                } else{
+                    return;
+                }
+
             }
 
             @Override
@@ -198,6 +225,50 @@ public class GameActivity extends AppCompatActivity {
             }
         });
 
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        if(gameDone){
+            finish();
+        } else {
+            gameDone = true;
+            if(!playerLeftGame){
+                playerLeftGame = true;
+                mGameroom.child("PlayerLeftGame").addListenerForSingleValueEvent(new ValueEventListener() {
+                    @Override
+                    public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                     mGameroom.child("PlayerLeftGame").setValue("TRUE");
+                        Toast.makeText(getApplicationContext(),"Du har forladt spillet. Lukker ned.", Toast.LENGTH_LONG).show();
+                        finish();
+                    }
+
+                    @Override
+                    public void onCancelled(@NonNull DatabaseError databaseError) {
+
+                    }
+            });
+        }
+            finish();
+        }
+
+
+
+        /*if(!gameDone && mGameroom.child("PlayerLeftGame").getKey().equals("FALSE")){
+            gameDone = true;
+            mGameroom.child("PlayerLeftGame").setValue("TRUE");
+            Toast.makeText(getApplicationContext(),"Du har forladt spillet. Lukker ned.", Toast.LENGTH_LONG).show();
+            mGameroom.removeValue();
+            finish();
+        } else if(!gameDone && mGameroom.child("PlayerLeftGame").getKey().equals("TRUE")){
+            gameDone = true;
+            Toast.makeText(getApplicationContext(),"Din modstander har forladt spillet. Lukker ned.", Toast.LENGTH_LONG).show();
+            mGameroom.removeValue();
+            finish();
+        } else {
+            finish();
+        } */
     }
 
     @NonNull
