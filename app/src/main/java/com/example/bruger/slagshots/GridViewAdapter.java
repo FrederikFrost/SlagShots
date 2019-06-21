@@ -18,14 +18,16 @@ public class GridViewAdapter extends BaseAdapter {
 
     private Context mContext;
     private GameModel model;
-    private boolean smallBoard;
+    private boolean isPlayerOne;
+    private boolean fogOfwar;
     private int selectedPosition = -1;
 
 
-    public GridViewAdapter(Context c, GameModel model, boolean smallBoard) {
+    public GridViewAdapter(Context c, GameModel model, boolean isPlayerOne, boolean fogOfWar) {
         mContext = c;
         this.model = model;
-        this.smallBoard = smallBoard;
+        this.isPlayerOne = isPlayerOne;
+        this.fogOfwar = fogOfWar;
     }
 
     @Override
@@ -61,7 +63,13 @@ public class GridViewAdapter extends BaseAdapter {
         } else {
             imageView = (SquareImageView) convertView;
         }
-        imageView.setImageResource(mThumbIds[model.getView(position,smallBoard)]);
+
+        if (fogOfwar){
+            imageView.setImageResource(mThumbIdsFog[model.getView(position,isPlayerOne)]);
+        } else {
+            imageView.setImageResource(mThumbIds[model.getView(position,isPlayerOne)]);
+        }
+
         if (position == selectedPosition) {
             Log.i("SKUD","Jeg sætter markerings farven");
             imageView.setColorFilter(Color.RED);
@@ -75,6 +83,11 @@ public class GridViewAdapter extends BaseAdapter {
     public Integer[] mThumbIds = {
             R.drawable.blank, R.drawable.blankhit,
             R.drawable.enemyhit, R.drawable.own,
+    };
+
+    public Integer[] mThumbIdsFog = {
+            R.drawable.blank, R.drawable.blankhit,
+            R.drawable.enemyhit, R.drawable.blank,
     };
 
 }

@@ -29,4 +29,15 @@ public class BoardField {
     }
 
     public boolean getHit() { return isHit; }
+
+    public String toString(){
+        String msg = "";
+        if (isShip){
+            msg = msg + "isShip";
+        }
+        if (isHit){
+            msg = msg + "isHit";
+        }
+        return msg;
+    }
 }

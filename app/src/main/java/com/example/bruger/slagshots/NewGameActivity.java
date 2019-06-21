@@ -26,6 +26,7 @@ import com.google.firebase.database.ValueEventListener;
 public class NewGameActivity extends AppCompatActivity {
     private FirebaseDatabase mDatabase;
     private DatabaseReference mGameRoom;
+    private DatabaseReference mTemp;
     private DatabaseReference mGameRoomsRoot;
     private int[] mGamePin = new int[1];
     private DatabaseReference mPlayerTwo;
@@ -40,13 +41,7 @@ public class NewGameActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_new_game);
-        final Button startSpilButton = (Button) findViewById(R.id.start_spil_button);
-        startSpilButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                startSpil();
-            }
-        });
+
         final Button afbrydSpilButton = (Button) findViewById(R.id.afbryd_spil_button);
         afbrydSpilButton.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -64,10 +59,6 @@ public class NewGameActivity extends AppCompatActivity {
         opstilSpillerNavne(inputName, "Venter på Spiller");
 
         mDatabase = FirebaseDatabase.getInstance();
-        DatabaseReference mRef = mDatabase.getReference("message");
-
-        mRef.setValue("Hello, World");
-
         mGameRoomsRoot = mDatabase.getReference("GameRooms");
 
         // Get a reference to the GameRoomCounter
@@ -82,6 +73,8 @@ public class NewGameActivity extends AppCompatActivity {
                 mGamePin[0] = counterInt;
                 counter = String.format("%06d", counterInt);
                 gamePinView.setText(counter);
+
+                //increment GameRoomCounter
                 counterRef.setValue(counterInt+1);
 
                 mGameRoom = mGameRoomsRoot.child("GameRoom"+mGamePin[0]);
@@ -99,7 +92,8 @@ public class NewGameActivity extends AppCompatActivity {
                         if(checkPlayerJoin(playerTwoName)){
                             opstilSpillerNavne(inputName, playerTwoName);
                             PlayerTwoJoined = true;
-                            Toast.makeText(getApplicationContext(),"En spiller har joinet", Toast.LENGTH_SHORT).show();
+                            Toast.makeText(getApplicationContext(),"En spiller har joinet. Starter spillet...", Toast.LENGTH_SHORT).show();
+                            startSpil();
                         } else {
                             if(PlayerTwoJoined){
                                 Toast.makeText(getApplicationContext(),"En spiller har forladt GameRoom", Toast.LENGTH_SHORT).show();
@@ -133,12 +127,15 @@ public class NewGameActivity extends AppCompatActivity {
     public void startSpil() {
         if(PlayerTwoJoined){
             spilStartet = true;
-            startActivity(new Intent(getApplicationContext(), GameActivity.class));
+            Intent newGameIntent = new Intent(getApplicationContext(), GameActivity.class);
+            newGameIntent.putExtra("GameroomName","GameRoom"+mGamePin[0]);
+            newGameIntent.putExtra("isPlayerOne",true);
+            startActivity(newGameIntent);
         } else {
             Toast.makeText(getApplicationContext(),"Mangler en modstander", Toast.LENGTH_SHORT).show();
         }
-
     }
+
     public void afbrydSpil() {
         spilLukket = true;
         lukGameRoom();

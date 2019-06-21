@@ -82,6 +82,11 @@ public class JoinGameActivity extends AppCompatActivity {
                         return;
                     } */
                    //finish();
+
+                    Intent newGameIntent = new Intent(getApplicationContext(), GameActivity.class);
+                    newGameIntent.putExtra("GameroomName","GameRoom"+mGamePin[0]);
+                    newGameIntent.putExtra("isPlayerOne",false);
+                    startActivity(newGameIntent);
                 }
             }
 
