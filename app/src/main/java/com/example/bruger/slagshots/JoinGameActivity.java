@@ -10,6 +10,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.text.InputFilter;
 import android.text.InputType;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
@@ -57,17 +58,24 @@ public class JoinGameActivity extends AppCompatActivity {
                     gamePin = formatPin(editText.getText().toString());
                     mGamePin[0] = Integer.parseInt(gamePin);
 
-                    mGameRoomsRoot.child("GameRoom"+gamePin);
+
                     mGameRoomsRoot.addListenerForSingleValueEvent(new ValueEventListener() {
                         @Override
                         public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                            if(dataSnapshot.getValue() == null){
+                            if(!dataSnapshot.hasChild("GameRoom"+mGamePin[0]) || !dataSnapshot.child("GameRoom"+mGamePin[0])
+                            .child("PlayerTwo").getValue().toString().equals("-1")){
+                                Log.i("SpilStart", "Spil kunne ikke startes med GamePin : "+mGamePin[0]);
                                 Toast.makeText(getApplicationContext(), "Indtast venligst et gyldigt gamepin", Toast.LENGTH_SHORT).show();
                                 return;
                             } else{
                                 mGameRoom = mGameRoomsRoot.child("GameRoom"+mGamePin[0]);
                                 mGameRoom.child("PlayerTwo").setValue(inputName);
+                                Intent newGameIntent = new Intent(getApplicationContext(), GameActivity.class);
+                                newGameIntent.putExtra("GameroomName","GameRoom"+mGamePin[0]);
+                                newGameIntent.putExtra("isPlayerOne",false);
+                                startActivity(newGameIntent);
                                 Toast.makeText(getApplicationContext(), "Dit spil blev fundet. Held og lykke matros!", Toast.LENGTH_LONG).show();
+                                Log.i("SpilStart", "Spil startet med GameRoomID : "+mGamePin[0]);
                             }
                         }
 
@@ -77,32 +85,11 @@ public class JoinGameActivity extends AppCompatActivity {
                         }
                     });
 
-                    /*if((mGameRoom = mDatabase.getReference("GameRoom"+mGamePin[0])) != null){
-                        mGameRoom.child("PlayerTwo").setValue(inputName);
-                    } else{
-                        Toast.makeText(getApplicationContext(), "Indtast venligst et gyldigt gamepin", Toast.LENGTH_SHORT).show();
-                        return;
-                    } */
-                   //finish();
-
-                    Intent newGameIntent = new Intent(getApplicationContext(), GameActivity.class);
-                    newGameIntent.putExtra("GameroomName","GameRoom"+mGamePin[0]);
-                    newGameIntent.putExtra("isPlayerOne",false);
-                    startActivity(newGameIntent);
                 }
             }
 
     });
 
-
-
-        /* Intent s
-           TODO : Create GameScreenActivity class, which will basically be the same as NewGameActivity, for the person creating the game
-           intent.putExtra("gamepinNumber",gamepinNumber);
-            if(gamepinNumber == whatever gamepin som firebase har givet den anden bruger) {
-                 startActivity(intent);
-    }
-    */
 
     }
 
