@@ -1,12 +1,21 @@
 package com.example.bruger.slagshots;
 
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
+import android.preference.DialogPreference;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
+import android.view.Gravity;
 import android.view.View;
+import android.view.ViewGroup;
+import android.view.WindowManager;
 import android.widget.AdapterView;
 import android.widget.Button;
 import android.widget.GridView;
+import android.widget.ImageView;
+import android.widget.TextView;
+import android.widget.Toast;
 
 public class PrepGameActivity extends AppCompatActivity {
 
@@ -19,7 +28,7 @@ public class PrepGameActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_prep_game);
         model = new GameModel();
-        isPlayerOne = getIntent().getExtras().getBoolean("isPlayerOne",false);
+        isPlayerOne = getIntent().getExtras().getBoolean("isPlayerOne", false);
 
         final GridView gridView = (GridView) findViewById(R.id.gridView3);
         final PrepGameAdapter adapter = new PrepGameAdapter(this, model);
@@ -35,10 +44,6 @@ public class PrepGameActivity extends AppCompatActivity {
             }
         });
 
-
-
-
-
         Button ready = (Button) findViewById(R.id.readyButton);
         ready.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -47,7 +52,6 @@ public class PrepGameActivity extends AppCompatActivity {
                 intent.putExtra("isPlayerOne", isPlayerOne);
             }
         });
-
     }
-
 }
+

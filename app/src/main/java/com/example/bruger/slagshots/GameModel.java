@@ -1,5 +1,6 @@
 package com.example.bruger.slagshots;
 
+import android.text.BoringLayout;
 import android.util.Log;
 
 /**
