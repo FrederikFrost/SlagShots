@@ -1,7 +1,5 @@
 package com.example.bruger.slagshots;
 
-import android.annotation.SuppressLint;
-import android.content.Context;
 import android.content.Intent;
 import android.media.MediaPlayer;
 import android.os.Build;
@@ -11,7 +9,6 @@ import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.View;
-import android.view.ViewGroup;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
 import android.widget.AdapterView;
@@ -22,7 +19,6 @@ import android.widget.ImageView;
 import android.widget.Toast;
 import android.os.Vibrator;
 
-import com.google.firebase.database.ChildEventListener;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
@@ -31,17 +27,16 @@ import com.google.firebase.database.GenericTypeIndicator;
 import com.google.firebase.database.ValueEventListener;
 
 import java.util.ArrayList;
-import java.util.Arrays;
-
-import static java.lang.Boolean.FALSE;
-import static java.lang.Boolean.TRUE;
 
 
 public class GameActivity extends AppCompatActivity {
 
     private GameModel model;
     private boolean positionSelected = false;
+
     private boolean isPlayerOne;
+    private boolean playerOne = true;
+    private boolean playerTwo = false;
 
     private String gameroomName;
     private FirebaseDatabase mDatabaseRoot;
@@ -62,10 +57,8 @@ public class GameActivity extends AppCompatActivity {
     GridViewAdapter adapter2;
 
     private int turn = 1;
-    private int nShipsHit = 0;
-
-    private boolean playerOne = true;
-    private boolean playerTwo = false;
+    private int nShipsHitPlayerOne = 0;
+    private int nShipsHitPlayerTwo = 0;
 
     private boolean gameDone = false;
     private boolean playerLeftGame = false;
@@ -91,6 +84,10 @@ public class GameActivity extends AppCompatActivity {
         mShipView = (ImageView) findViewById(R.id.slagskib);
         mAnimationShoot = AnimationUtils.loadAnimation(this, R.anim.animation_shoot);
         mAnimationGotHit = AnimationUtils.loadAnimation(this, R.anim.animation_got_hit);
+
+        //init nShipsHit variable
+        hasBeenHit(playerOne);
+        hasBeenHit(playerTwo);
 
         //get ref to database from newGameActivity through the intent
         Intent intent = getIntent();
@@ -150,7 +147,6 @@ public class GameActivity extends AppCompatActivity {
                 //updates the board
                 model.playerOneBoard = convertFromArrayListToBoardField(temp);
 
-                //checking for player two
                 if (isPlayerOne) {
                     //if you has been hit
                     if (hasBeenHit(playerOne)) {
@@ -297,12 +293,15 @@ public class GameActivity extends AppCompatActivity {
         });
 
         //arranging the layout and creating adapters
+
+        //creating view for the smaller board, that is the players own board
         GridView gridView1 = (GridView) findViewById(R.id.gridView1);
-        adapter2 = new GridViewAdapter(this, model, !isPlayerOne, false);
+        adapter2 = new GridViewAdapter(this, model, isPlayerOne, false);
         gridView1.setAdapter(adapter2);
 
+        //creating the view for the bigger board, that is the enemy's board
         final GridView gridView2 = (GridView) findViewById(R.id.gridView2);
-        final GridViewAdapter adapter = new GridViewAdapter(this, model, isPlayerOne, true);
+        final GridViewAdapter adapter = new GridViewAdapter(this, model, !isPlayerOne, true);
         gridView2.setAdapter(adapter);
         gridView2.setOnItemClickListener(getListener(adapter));
 
@@ -320,15 +319,15 @@ public class GameActivity extends AppCompatActivity {
                 } else {
                     Log.i("SKUD", "Jeg affyrer skud.");
 
-                    //updates the board
-                    model.getBoardfieldAtPosition(adapter.getSelectedPosition(), isPlayerOne).hit();
+                    //updates the enemy's board
+                    model.getBoardfieldAtPosition(adapter.getSelectedPosition(),!isPlayerOne).hit();
 
-                    //converts and uploads the board to firebase
+                    //converts and uploads the enemy's updated board to firebase
                     if (isPlayerOne) {
-                        mGameroom.child("PlayerOnesBoard").setValue(convertFromBoardFieldToArrayList(model.playerTwoBoard));
+                        mGameroom.child("PlayerTwosBoard").setValue(convertFromBoardFieldToArrayList(model.playerTwoBoard));
                         mGameroom.child("Turn").setValue(2);
                     } else {
-                        mGameroom.child("PlayerTwosBoard").setValue(convertFromBoardFieldToArrayList(model.playerOneBoard));
+                        mGameroom.child("PlayerOnesBoard").setValue(convertFromBoardFieldToArrayList(model.playerOneBoard));
                         mGameroom.child("Turn").setValue(1);
                     }
 
@@ -491,10 +490,10 @@ public class GameActivity extends AppCompatActivity {
         return 0;
     }
 
-    private boolean hasBeenHit(boolean isPlayerOne){
+    private boolean hasBeenHit(boolean player){
         int newNShipsHit = 0;
         BoardField[] playerBoard;
-        if (isPlayerOne) {
+        if (player == playerOne) {
             playerBoard = model.playerOneBoard;
         } else {
             playerBoard = model.playerTwoBoard;
@@ -505,9 +504,17 @@ public class GameActivity extends AppCompatActivity {
                 newNShipsHit++;
             }
         }
-        if (newNShipsHit>nShipsHit){
-            nShipsHit = newNShipsHit;
-            return true;
+
+        if (player == playerOne) {
+            if (newNShipsHit > nShipsHitPlayerOne) {
+                nShipsHitPlayerOne = newNShipsHit;
+                return true;
+            }
+        } else {
+            if (newNShipsHit > nShipsHitPlayerTwo) {
+                nShipsHitPlayerTwo = newNShipsHit;
+                return true;
+            }
         }
         return false;
     }

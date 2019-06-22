@@ -11,6 +11,7 @@ public class GameModel {
 
     public BoardField[] playerTwoBoard;
     public BoardField[] playerOneBoard;
+
     public final String TAG = "DEBUGGER";
     public final String DEBUGGER_STRING = "This object is null!";
 
@@ -30,15 +31,15 @@ public class GameModel {
     }
 
     public BoardField getBoardfieldAtPosition(int pos, boolean isPlayerOne) {
-        return isPlayerOne ? playerTwoBoard[pos]: playerOneBoard[pos];
+        return isPlayerOne ? playerOneBoard[pos]: playerTwoBoard[pos];
     }
 
     public void setBoardfieldAtPosition(BoardField boardField, int pos, boolean isPlayerOne) {
         Log.i(TAG,"I set a boardfield");
         if (isPlayerOne){
-            playerTwoBoard[pos] = boardField;
-        } else {
             playerOneBoard[pos] = boardField;
+        } else {
+            playerTwoBoard[pos] = boardField;
         }
     }
 
@@ -71,7 +72,7 @@ public class GameModel {
 
     public int getView(int pos, boolean isPlayerOne) {
 
-        BoardField boardField = isPlayerOne ? playerTwoBoard[pos]: playerOneBoard[pos];
+        BoardField boardField = isPlayerOne ? playerOneBoard[pos]: playerTwoBoard[pos];
         if (boardField == null) {
             Log.i(TAG,DEBUGGER_STRING);
         }
