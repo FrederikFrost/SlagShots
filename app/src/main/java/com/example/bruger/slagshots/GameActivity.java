@@ -1,16 +1,23 @@
 package com.example.bruger.slagshots;
 
 import android.content.Intent;
+import android.media.MediaPlayer;
+import android.os.Build;
 import android.os.Bundle;
+import android.os.VibrationEffect;
 import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.View;
+import android.view.animation.Animation;
+import android.view.animation.AnimationUtils;
 import android.widget.AdapterView;
 import android.widget.Button;
 import android.widget.GridView;
 import android.widget.AdapterView.OnItemClickListener;
+import android.widget.ImageView;
 import android.widget.Toast;
+import android.os.Vibrator;
 
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
@@ -33,9 +40,24 @@ public class GameActivity extends AppCompatActivity {
     private DatabaseReference mGamerooms;
     private DatabaseReference mGameroom;
 
+    private ImageView mShipView;
+    private ImageView mFireBallView;
+    private Animation mAnimationShoot;
+    private Animation mAnimationGotHit;
+
+    private Vibrator vibrator;
+
+    private MediaPlayer mpCannon;
+    private MediaPlayer mpExplosion;
+    private MediaPlayer mpSplash;
+
     GridViewAdapter adapter2;
 
     private int turn = 1;
+    private int nShipsHit = 0;
+
+    private boolean playerOne = true;
+    private boolean playerTwo = false;
 
     private boolean gameDone = false;
 
@@ -46,6 +68,20 @@ public class GameActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         model = new GameModel();
         setContentView(R.layout.activity_game);
+
+        //init vibrator
+        vibrator = (Vibrator) getSystemService(this.VIBRATOR_SERVICE);
+
+        //init mediaplayer
+        final MediaPlayer mpCannon = MediaPlayer.create(this, R.raw.cannon_new);
+        final MediaPlayer mpExplosion = MediaPlayer.create(this, R.raw.explosion);
+        final MediaPlayer mpSplash = MediaPlayer.create(this, R.raw.splash);
+
+        //load animations
+        mFireBallView = (ImageView) findViewById(R.id.fireball);
+        mShipView = (ImageView) findViewById(R.id.slagskib);
+        mAnimationShoot = AnimationUtils.loadAnimation(this, R.anim.animation_shoot);
+        mAnimationGotHit = AnimationUtils.loadAnimation(this, R.anim.animation_got_hit);
 
         //get ref to database from newGameActivity through the intent
         Intent intent = getIntent();
@@ -61,8 +97,8 @@ public class GameActivity extends AppCompatActivity {
 
         //set values of game variables
         mGameroom.child("Turn").setValue(1);
-        mGameroom.child("PlayerOnesBoard").setValue(convertFromBoardFieldToArrayList(model.playerTwoBoard));
-        mGameroom.child("PlayerTwosBoard").setValue(convertFromBoardFieldToArrayList(model.playerOneBoard));
+        mGameroom.child("PlayerOnesBoard").setValue(convertFromBoardFieldToArrayList(model.playerOneBoard));
+        mGameroom.child("PlayerTwosBoard").setValue(convertFromBoardFieldToArrayList(model.playerTwoBoard));
 
         //create listener that updates player one's board
         mGameroom.child("PlayerOnesBoard").addValueEventListener(new ValueEventListener() {
@@ -71,12 +107,36 @@ public class GameActivity extends AppCompatActivity {
                 if(gameDone){
                     return;
                 }
+
                 //converts data back to BoardField array
                 GenericTypeIndicator<ArrayList<Integer>> t = new GenericTypeIndicator<ArrayList<Integer>>() {};
                 ArrayList<Integer> temp = dataSnapshot.getValue(t);
                 //updates the board
-                model.playerTwoBoard = convertFromArrayListToBoardField(temp);
+                model.playerOneBoard = convertFromArrayListToBoardField(temp);
 
+                //checking for player two
+                if (isPlayerOne) {
+                    //if you has been hit
+                    if (hasBeenHit(playerOne)) {
+                        Toast.makeText(getApplicationContext(), "Dit skib er blevet ramt!", Toast.LENGTH_SHORT).show();
+                        vibrate();
+                        mpExplosion.start();
+                        mShipView.startAnimation(mAnimationGotHit);
+                    } else {
+                        Toast.makeText(getApplicationContext(), "Din modstander missede sit skud", Toast.LENGTH_SHORT).show();
+                        mpSplash.start();
+                    }
+                } else {
+                    //if enemy has been hit
+                    if (hasBeenHit(playerOne)) {
+                        Toast.makeText(getApplicationContext(), "Du ramte din modstanders skib!", Toast.LENGTH_SHORT).show();
+                        vibrate();
+                        mpExplosion.start();
+                    } else {
+                        Toast.makeText(getApplicationContext(), "Du missede dit skud", Toast.LENGTH_SHORT).show();
+                        mpSplash.start();
+                    }
+                }
                 Log.i("Oliver","Updated model.playerTwoBoard");
             }
 
@@ -97,7 +157,32 @@ public class GameActivity extends AppCompatActivity {
                 GenericTypeIndicator<ArrayList<Integer>> t = new GenericTypeIndicator<ArrayList<Integer>>() {};
                 ArrayList<Integer> temp = dataSnapshot.getValue(t);
                 //updates the board
-                model.playerOneBoard = convertFromArrayListToBoardField(temp);
+                model.playerTwoBoard = convertFromArrayListToBoardField(temp);
+
+                //checking for player two
+                if (!isPlayerOne) {
+                    //if you has been hit
+                    if (hasBeenHit(playerTwo)) {
+                        Toast.makeText(getApplicationContext(), "Dit skib er blevet ramt!", Toast.LENGTH_SHORT).show();
+                        vibrate();
+                        mpExplosion.start();
+                        mShipView.startAnimation(mAnimationGotHit);
+                    } else {
+                        Toast.makeText(getApplicationContext(), "Din modstander missede sit skud", Toast.LENGTH_SHORT).show();
+                        mpSplash.start();
+                    }
+                } else {
+                    //if enemy has been hit
+                    if (hasBeenHit(playerTwo)) {
+                        Toast.makeText(getApplicationContext(), "Du ramte din modstanders skib!", Toast.LENGTH_SHORT).show();
+                        vibrate();
+                        mpExplosion.start();
+                    } else {
+                        Toast.makeText(getApplicationContext(), "Du missede dit skud", Toast.LENGTH_SHORT).show();
+                        mpSplash.start();
+                    }
+                }
+
 
                 Log.i("Oliver","Updated model.playerOneBoard");
             }
@@ -182,6 +267,14 @@ public class GameActivity extends AppCompatActivity {
                         mGameroom.child("PlayerTwosBoard").setValue(convertFromBoardFieldToArrayList(model.playerOneBoard));
                         mGameroom.child("Turn").setValue(1);
                     }
+
+                    //plays shoot animation
+                    mFireBallView.setVisibility(View.VISIBLE);
+                    mFireBallView.startAnimation(mAnimationShoot);
+                    mFireBallView.setVisibility(View.INVISIBLE);
+
+                    //play cannon sound
+                    mpCannon.start();
 
                     //resets the selected position
                     adapter.setSelectedPosition(-1);
@@ -288,5 +381,35 @@ public class GameActivity extends AppCompatActivity {
         }
 
         return 0;
+    }
+
+    private boolean hasBeenHit(boolean isPlayerOne){
+        int newNShipsHit = 0;
+        BoardField[] playerBoard;
+        if (isPlayerOne) {
+            playerBoard = model.playerOneBoard;
+        } else {
+            playerBoard = model.playerTwoBoard;
+        }
+
+        for (BoardField bf : playerBoard){
+            if (bf.getShip() && bf.getHit()){
+                newNShipsHit++;
+            }
+        }
+        if (newNShipsHit>nShipsHit){
+            nShipsHit = newNShipsHit;
+            return true;
+        }
+        return false;
+    }
+
+    private void vibrate(){
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            vibrator.vibrate(VibrationEffect.createOneShot(500, VibrationEffect.DEFAULT_AMPLITUDE));
+        } else {
+            //deprecated in API 26
+            vibrator.vibrate(500);
+        }
     }
 }

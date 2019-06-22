@@ -18,10 +18,10 @@ public class GameModel {
         Log.i(TAG, "I made it in the GameModel constructer");
         playerTwoBoard = new BoardField[100];
         createBoardField(playerTwoBoard);
-        //getTestBoard(playerTwoBoard);
+        getTestBoard(playerTwoBoard);
         playerOneBoard = new BoardField[100];
         createBoardField(playerOneBoard);
-        //getTestBoard2(playerOneBoard);
+        getTestBoard2(playerOneBoard);
     }
 
     public int getCount() {
@@ -50,6 +50,8 @@ public class GameModel {
 
     public void getTestBoard(BoardField[] board) {
         board[3].hit();
+        board[12].setShip(true);
+        board[13].setShip(true);
         board[14].setShip(true);
         board[15].setShip(true);
         board[15].hit();
@@ -58,6 +60,8 @@ public class GameModel {
 
     public void getTestBoard2(BoardField[] board) {
             board[55].hit();
+            board[1].setShip(true);
+            board[2].setShip(true);
             board[12].setShip(true);
             board[19].setShip(true);
             board[19].hit();
