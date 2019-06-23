@@ -1,5 +1,7 @@
 package com.example.bruger.slagshots;
 
+import android.app.AlertDialog;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.media.MediaPlayer;
 import android.os.Build;
@@ -62,6 +64,11 @@ public class GameActivity extends AppCompatActivity {
 
     private boolean gameDone = false;
     private boolean playerLeftGame = false;
+
+    private ValueEventListener playerOneBoardListener;
+    private ValueEventListener playerTwoBoardListener;
+    private ValueEventListener turnListener;
+    private ValueEventListener playerLeftGameListener;
 
 
     @Override
@@ -134,15 +141,19 @@ public class GameActivity extends AppCompatActivity {
         });
 
         //create listener that updates player one's board
-        mGameroom.child("PlayerOnesBoard").addValueEventListener(new ValueEventListener() {
+        playerOneBoardListener = mGameroom.child("PlayerOnesBoard").addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+
+                //checks goal so not to display messages if game has ended
+                checkGoal();
                 if(gameDone || playerLeftGame){
                     return;
                 }
 
                 //converts data back to BoardField array
-                GenericTypeIndicator<ArrayList<Integer>> t = new GenericTypeIndicator<ArrayList<Integer>>() {};
+                GenericTypeIndicator<ArrayList<Integer>> t = new GenericTypeIndicator<ArrayList<Integer>>() {
+                };
                 ArrayList<Integer> temp = dataSnapshot.getValue(t);
                 //updates the board
                 model.playerOneBoard = convertFromArrayListToBoardField(temp);
@@ -169,7 +180,7 @@ public class GameActivity extends AppCompatActivity {
                         mpSplash.start();
                     }
                 }
-                Log.i("Oliver","Updated model.playerTwoBoard");
+                Log.i("Oliver", "Updated model.playerTwoBoard");
             }
 
             @Override
@@ -179,12 +190,16 @@ public class GameActivity extends AppCompatActivity {
         });
 
         //create listener that updates player two's board
-        mGameroom.child("PlayerTwosBoard").addValueEventListener(new ValueEventListener() {
+        playerTwoBoardListener = mGameroom.child("PlayerTwosBoard").addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+
+                //checks goal so not to display messages if game has ended
+                checkGoal();
                 if(gameDone || playerLeftGame){
                     return;
                 }
+
                 //converts data back to BoardField array
                 GenericTypeIndicator<ArrayList<Integer>> t = new GenericTypeIndicator<ArrayList<Integer>>() {};
                 ArrayList<Integer> temp = dataSnapshot.getValue(t);
@@ -226,12 +241,14 @@ public class GameActivity extends AppCompatActivity {
         });
 
         //create listener for turn variable. This code will be run at the start of each turn
-        mGameroom.child("Turn").addValueEventListener(new ValueEventListener() {
+        turnListener = mGameroom.child("Turn").addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+
                 if(gameDone || playerLeftGame){
                     return;
                 }
+
                 //recieve turn variable
                 turn = Integer.parseInt(dataSnapshot.getValue().toString());
 
@@ -251,13 +268,10 @@ public class GameActivity extends AppCompatActivity {
                         Toast.makeText(getApplicationContext(), playerOneName[0] +" har vundet!!", Toast.LENGTH_SHORT).show();
                     }
                     gameDone = true;
-                    mGameroom.removeValue();
                     finish();
                 } else if(isPlayersTurn(isPlayerOne)){
                     Toast.makeText(getApplicationContext(),"Det er din tur!", Toast.LENGTH_SHORT).show();
                 }
-
-
 
 
                 Log.i("Oliver","We got the turn value "+turn);
@@ -270,20 +284,16 @@ public class GameActivity extends AppCompatActivity {
         });
 
         //Create listener that checks if a player left the game.
-        mGameroom.child("PlayerLeftGame").addValueEventListener(new ValueEventListener() {
+        playerLeftGameListener = mGameroom.child("PlayerLeftGame").addValueEventListener(new ValueEventListener() {
+
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                if(playerLeftGame || gameDone){
-                    finish();
-                } else if (dataSnapshot.exists() && dataSnapshot.getValue().toString().equals("TRUE")){
-                    playerLeftGame = true;
-                    Toast.makeText(getApplicationContext(),"Din modstander har forladt spillet. Lukker ned.", Toast.LENGTH_LONG).show();
-                    mGameroom.removeValue();
-                    finish();
-                } else{
-                    return;
-                }
 
+                if (dataSnapshot.exists() && dataSnapshot.getValue().toString().equals("TRUE")){
+                    Toast.makeText(getApplicationContext(),"Din modstander har forladt spillet. Lukker ned.", Toast.LENGTH_LONG).show();
+                    playerLeftGame = true;
+                    finish();
+                }
             }
 
             @Override
@@ -352,31 +362,53 @@ public class GameActivity extends AppCompatActivity {
     }
 
     @Override
-    protected void onDestroy() {
-        super.onDestroy();
-        if(gameDone){
-            finish();
-        } else {
-            gameDone = true;
-            if(!playerLeftGame){
-                playerLeftGame = true;
-                mGameroom.child("PlayerLeftGame").addListenerForSingleValueEvent(new ValueEventListener() {
-                    @Override
-                    public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                     mGameroom.child("PlayerLeftGame").setValue("TRUE");
-                        Toast.makeText(getApplicationContext(),"Du har forladt spillet. Lukker ned.", Toast.LENGTH_LONG).show();
+    public void onBackPressed() {
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setMessage("Are you sure you want to exit?")
+                .setCancelable(false)
+                .setPositiveButton("Yes", new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int id) {
                         finish();
                     }
-
-                    @Override
-                    public void onCancelled(@NonNull DatabaseError databaseError) {
-
+                })
+                .setNegativeButton("No", new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int id) {
+                        dialog.cancel();
                     }
-            });
-        }
-            finish();
-        }
+                });
+        AlertDialog alert = builder.create();
+        alert.show();
+    }
 
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+
+        Log.i("Oliver",isPlayerOne+", destroying listeners");
+        mGameroom.removeEventListener(playerOneBoardListener);
+        mGameroom.removeEventListener(playerTwoBoardListener);
+        mGameroom.removeEventListener(turnListener);
+        mGameroom.removeEventListener(playerLeftGameListener);
+
+        if (!playerLeftGame) { //if you are first player to exit game
+            playerLeftGame = true;
+            mGameroom.child("PlayerLeftGame").addListenerForSingleValueEvent(new ValueEventListener() {
+                @Override
+                public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                    mGameroom.child("PlayerLeftGame").setValue("TRUE");
+                    Toast.makeText(getApplicationContext(), "Du har forladt spillet.", Toast.LENGTH_LONG).show();
+                    return;
+                }
+
+                @Override
+                public void onCancelled(@NonNull DatabaseError databaseError) {
+                }
+            });
+        } else { // if last player to exit game
+            //delete gameroom
+            mGameroom.removeValue();
+            return;
+        }
 
 
         /*if(!gameDone && mGameroom.child("PlayerLeftGame").getKey().equals("FALSE")){
