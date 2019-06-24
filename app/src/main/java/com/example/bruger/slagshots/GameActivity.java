@@ -154,8 +154,8 @@ public class GameActivity extends AppCompatActivity {
         if (!bothConnected) {
             progressDialog = new ProgressDialog(this);
             // Setting Title
-            progressDialog.setTitle("Title");
-            progressDialog.setMessage("Waiting for the other player...");
+            progressDialog.setTitle("");
+            progressDialog.setMessage("Venter på din modstander...");
             progressDialog.setProgressStyle(ProgressDialog.STYLE_HORIZONTAL);
             progressDialog.setProgressStyle(ProgressDialog.STYLE_SPINNER);
             progressDialog.setCancelable(false);
@@ -532,7 +532,6 @@ public class GameActivity extends AppCompatActivity {
             mGameroom.removeValue();
             return;
         }
-
 
         /*if(!gameDone && mGameroom.child("PlayerLeftGame").getKey().equals("FALSE")){
             gameDone = true;
