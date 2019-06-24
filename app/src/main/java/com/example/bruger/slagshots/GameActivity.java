@@ -3,6 +3,7 @@ package com.example.bruger.slagshots;
 import android.annotation.SuppressLint;
 import android.app.AlertDialog;
 import android.app.ProgressDialog;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Color;
@@ -82,6 +83,8 @@ public class GameActivity extends AppCompatActivity {
 
     private boolean bothConnected = false;
     private boolean progressDialogRunning = true;
+    private boolean toastActivated = false;
+    private Context context;
 
     private ArrayList<Integer> boardTemp;
 
@@ -90,9 +93,11 @@ public class GameActivity extends AppCompatActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_game);
+
+        //get context for toast messages
+        context = getApplicationContext();
 
         //init vibrator
         vibrator = (Vibrator) getSystemService(this.VIBRATOR_SERVICE);
@@ -267,6 +272,7 @@ public class GameActivity extends AppCompatActivity {
                     //if you has been hit
                     if (hasBeenHit(playerOne)) {
                         Toast.makeText(getApplicationContext(), "Dit skib er blevet ramt!", Toast.LENGTH_SHORT).show();
+
                         vibrate();
                         mpExplosion.start();
                         mShipView.startAnimation(mAnimationGotHit);
@@ -282,8 +288,12 @@ public class GameActivity extends AppCompatActivity {
                         vibrate();
                         mpExplosion.start();
                     } else {
-                        Toast.makeText(getApplicationContext(), "Du missede dit skud", Toast.LENGTH_SHORT).show();
-                        mpSplash.start();
+                        if (toastActivated){
+                            Toast.makeText(getApplicationContext(), "Du missede dit skud", Toast.LENGTH_SHORT).show();
+                            mpSplash.start();
+                        } else {
+                            toastActivated = true;
+                        }
                     }
                 }
                 Log.i("Oliver", "Updated model.playerTwoBoard");
@@ -345,8 +355,12 @@ public class GameActivity extends AppCompatActivity {
                         vibrate();
                         mpExplosion.start();
                     } else {
-                        Toast.makeText(getApplicationContext(), "Du missede dit skud", Toast.LENGTH_SHORT).show();
-                        mpSplash.start();
+                        if (toastActivated) {
+                            Toast.makeText(getApplicationContext(), "Du missede dit skud", Toast.LENGTH_SHORT).show();
+                            mpSplash.start();
+                        } else {
+                            toastActivated = true;
+                        }
                     }
                 }
 
@@ -486,6 +500,7 @@ public class GameActivity extends AppCompatActivity {
 
     @Override
     public void onBackPressed() {
+        super.onBackPressed();
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
         builder.setMessage("Are you sure you want to exit?")
                 .setCancelable(false)
