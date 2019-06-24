@@ -11,11 +11,13 @@ public class PrepGameAdapter extends BaseAdapter {
     private Context mContext;
     private GameModel model;
     private int selectedPosition = -1;
+    private boolean isPlayerOne;
 
 
-    public PrepGameAdapter(Context c, GameModel model) {
+    public PrepGameAdapter(Context c, GameModel model, boolean isPlayerOne) {
         mContext = c;
         this.model = model;
+        this.isPlayerOne = isPlayerOne;
     }
 
     @Override
@@ -51,7 +53,7 @@ public class PrepGameAdapter extends BaseAdapter {
         } else {
             imageView = (SquareImageView) convertView;
         }
-        imageView.setImageResource(mThumbIds[model.getView(position,false)]);
+        imageView.setImageResource(mThumbIds[model.getView(position)]);
         if (position == selectedPosition) {
             Log.i("SKUD","Jeg sætter markerings farven");
             imageView.setColorFilter(Color.rgb(255,0,255));

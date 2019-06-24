@@ -49,13 +49,13 @@ public class GameActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
 
         super.onCreate(savedInstanceState);
-        model = new GameModel();
         setContentView(R.layout.activity_game);
 
         //get ref to database from newGameActivity through the intent
         Intent intent = getIntent();
         gameroomName = intent.getStringExtra("GameroomName");
         isPlayerOne = intent.getBooleanExtra("isPlayerOne",false);
+        model = new GameModel(isPlayerOne);
         Log.i("Oliver","Got the following string from intent:"+gameroomName);
         Log.i("Oliver","I am player " + (isPlayerOne ?1:2));
 
@@ -177,7 +177,7 @@ public class GameActivity extends AppCompatActivity {
                     Log.i("SKUD", "Jeg affyrer skud.");
 
                     //updates the board
-                    model.getBoardfieldAtPosition(adapter.getSelectedPosition(), isPlayerOne).hit();
+                    model.getBoardfieldAtPosition(adapter.getSelectedPosition()).hit();
 
                     //converts and uploads the board to firebase
                     if (isPlayerOne) {
