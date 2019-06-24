@@ -30,9 +30,7 @@ public class PrepGameActivity extends AppCompatActivity {
     private boolean isPlayerOne;
     private boolean positionSelected;
     private boolean deleteShips = false;
-    private ArrayList<Integer> ships = new ArrayList<Integer>();
     private boolean submarineIsPlaced = false;
-
     private ArrayList<Ship> registeredShips = new ArrayList<Ship>();
 
     @Override
@@ -142,8 +140,6 @@ public class PrepGameActivity extends AppCompatActivity {
                     mAdapter.setSelectedPosition(-1);
                     mAdapter.notifyDataSetChanged();
                 } else {
-                    //TODO: Unregister ship
-                    //unRegisterShip(getShipLength(position,mAdapter.getSelectedPosition()));
                     Log.i("Place", "Placeres ikke, da der allerede fandtes et skib");
 
                     invalid = true;
@@ -217,10 +213,6 @@ public class PrepGameActivity extends AppCompatActivity {
 
     public boolean checkRegistered(int shipLength) {
 
-
-        for (int p:ships) {
-            Log.i("Place", "Skib registreret på længde " + p);
-        }
         if (registeredShips == null) {
              return true;
         } else {
@@ -241,13 +233,9 @@ public class PrepGameActivity extends AppCompatActivity {
             if (!containsShip) {
                 return true;
             } else if (temp.getShipLength() == 3 && extraShip == 1) {
-                //extraShip++;
                 return true;
             } else {
                 Log.i("Place", "Skibet er allerede registreret");
-                for (int p : ships) {
-                    Log.i("Place", "Skib registreret på længde " + p);
-                }
                 return false;
             }
         }
@@ -257,11 +245,6 @@ public class PrepGameActivity extends AppCompatActivity {
         boolean row = (end <= start+4)&&(start-4 <= end);
 
         return row? 1 + Math.abs(end-start): 1 + Math.abs((end-start)/10);
-    }
-
-    public void unRegisterShip(int shipLength){
-        Log.i("Place", "Skibet afregistreres" );
-        ships.remove(ships.indexOf(shipLength));
     }
 
     public ArrayList<Integer> convertFromBoardFieldToArrayList(BoardField[] playerBoard){
