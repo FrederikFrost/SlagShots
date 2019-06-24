@@ -24,10 +24,10 @@ public class GameModel {
         Log.i(TAG, "I made it in the GameModel constructer");
         playerTwoBoard = new BoardField[100];
         createBoardField(playerTwoBoard);
-        getTestBoard(playerTwoBoard);
+        //getTestBoard(playerTwoBoard);
         playerOneBoard = new BoardField[100];
         createBoardField(playerOneBoard);
-        getTestBoard2(playerOneBoard);
+        //getTestBoard2(playerOneBoard);
     }
 
     public int getCount() {
@@ -95,7 +95,7 @@ public class GameModel {
         }
     }
 
-    public boolean addShip(int start, int end) {
+    public ArrayList<BoardField> addShip(int start, int end) {
         //TODO: add ship
         Log.i("Place", "Skibet placeres");
         BoardField[] board = isPlayerOne? playerOneBoard:playerTwoBoard; //TODO: Maybe change this..?
@@ -112,13 +112,13 @@ public class GameModel {
             } else {
                 Log.i("Place", "Der var allerede et skib på " + i);
                 deleteShip(ship);
-                return false;
+                return null;
             }
 
             i = i+count;
         }
 
-        return true;
+        return ship;
     }
 
     public void deleteShip(ArrayList<BoardField> ship) {

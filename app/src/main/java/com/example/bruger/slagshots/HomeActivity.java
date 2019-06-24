@@ -140,9 +140,12 @@ public class HomeActivity extends AppCompatActivity {
     }
 
     private void opretSpil(){
-        Intent intent = new Intent(HomeActivity.this,NewGameActivity.class);
+        Intent intent = new Intent(HomeActivity.this,PrepGameActivity.class);
         intent.putExtra("inputName",inputName);
+        intent.putExtra("isPlayerOne",true);
         startActivity(intent);
+
+
     }
 
     private void joinSpil(){

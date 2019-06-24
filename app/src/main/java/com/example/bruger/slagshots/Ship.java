@@ -3,19 +3,15 @@ package com.example.bruger.slagshots;
 import java.util.ArrayList;
 
 public class Ship {
-    private int length;
-    private ArrayList<Integer> coords = new ArrayList<Integer>();
-    private boolean row;
+    private ArrayList<BoardField> coords = new ArrayList<BoardField>();
+    private int shipLength;
 
-    public Ship(int length, boolean row, ArrayList<Integer> coords) {
-        this.length = length;
-        this.row = row;
+    public Ship(int shipLength, ArrayList<BoardField> coords) {
         this.coords = coords;
+        this.shipLength = shipLength;
     }
 
-    public int getLength(){return length;}
+    public ArrayList<BoardField> getCoords() {return coords;}
 
-    public boolean getRow(){return row;}
-
-    public ArrayList<Integer> getCoords() {return coords;}
+    public int getShipLength() {return shipLength;}
 }

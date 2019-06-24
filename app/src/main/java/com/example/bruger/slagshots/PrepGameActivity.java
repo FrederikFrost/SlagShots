@@ -23,6 +23,7 @@ public class PrepGameActivity extends AppCompatActivity {
     private boolean positionSelected;
     private boolean deleteShips = false;
     private ArrayList<Integer> ships = new ArrayList<Integer>();
+    private ArrayList<Ship> registeredShips = new ArrayList<Ship>();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -88,13 +89,15 @@ public class PrepGameActivity extends AppCompatActivity {
         } else {
             if (legalPosition(position)) {
                 Log.i("Place", "Positionen er godkendt");
-                if (model.addShip(mAdapter.getSelectedPosition(),position)) {
+                Ship ship = new Ship(getShipLength(mAdapter.getSelectedPosition(),position),model.addShip(mAdapter.getSelectedPosition(),position));
+                if (ship.getCoords() != null) {
+                    registeredShips.add(ship);
                     positionSelected=false;
                     mAdapter.setSelectedPosition(-1);
                     mAdapter.notifyDataSetChanged();
                 } else {
                     //TODO: Unregister ship
-                    unRegisterShip(getShipLength(position,mAdapter.getSelectedPosition()));
+                    //unRegisterShip(getShipLength(position,mAdapter.getSelectedPosition()));
                     Log.i("Place", "Placeres ikke, da der allerede fandtes et skib");
 
                     invalid = true;
@@ -114,6 +117,23 @@ public class PrepGameActivity extends AppCompatActivity {
     }
 
     private void deleteShipSequence(int pos) {
+
+        Ship temp = null;
+        for (Ship s: registeredShips) {
+            for (BoardField b: s.getCoords()) {
+                if (model.getBoardfieldAtPosition(pos).equals(b)) {
+                    temp = s;
+                    break;
+                }
+            }
+        }
+
+        if (temp != null) {
+            model.deleteShip(temp.getCoords());
+            registeredShips.remove(temp);
+        } else Toast.makeText(getApplicationContext(),"Ship not found", Toast.LENGTH_LONG).show();
+
+        mAdapter.notifyDataSetChanged();
 
     }
 
@@ -140,7 +160,7 @@ public class PrepGameActivity extends AppCompatActivity {
             return false;
         } else { //
             int shipLength = getShipLength(lastPos, chosenPos);
-            if (registerShip(shipLength)) {
+            if (checkRegistered(shipLength)) {
                 return true;
             } else {
                 return false;
@@ -148,42 +168,43 @@ public class PrepGameActivity extends AppCompatActivity {
         }
     }
 
-    public boolean registerShip(int shipLength) {
-        int extraShip = 0;
-        for (int p:ships) {
-            if (p == 3) {
-                extraShip++;
-            }
-        }
+    public boolean checkRegistered(int shipLength) {
+
+
 
         for (int p:ships) {
             Log.i("Place", "Skib registreret på længde " + p);
         }
-         if (ships == null) {
-             ships.add(shipLength);
-             Log.i("Place", "Skibet registreres");
-             for (int p:ships) {
-                 Log.i("Place", "Skib registreret på længde " + p);
-             }
+        if (registeredShips == null) {
              return true;
-         } else if (!ships.contains(shipLength)){
-             ships.add(shipLength);
-             Log.i("Place", "Skibet registreres");
-             for (int p:ships) {
-                 Log.i("Place", "Skib registreret på længde " + p);
-             }
-             return true;
-         } else if(shipLength == 3 && extraShip == 1) {
-             ships.add(shipLength);
-             extraShip++;
-             return true;
-         } else{
-             Log.i("Place", "Skibet er allerede registreret" );
-             for (int p:ships) {
-                 Log.i("Place", "Skib registreret på længde " + p);
-             }
-             return false;
-         }
+        } else {
+            int extraShip = 0;
+            boolean containsShip = false;
+            Ship temp = null;
+            for (Ship ship:registeredShips) {
+                if (ship.getShipLength() == 3) {
+                    extraShip++;
+                }
+
+                if(ship.getShipLength() == shipLength) {
+                    containsShip = true;
+                    temp = ship;
+                }
+            }
+
+            if (!containsShip) {
+                return true;
+            } else if (temp.getShipLength() == 3 && extraShip == 1) {
+                //extraShip++;
+                return true;
+            } else {
+                Log.i("Place", "Skibet er allerede registreret");
+                for (int p : ships) {
+                    Log.i("Place", "Skib registreret på længde " + p);
+                }
+                return false;
+            }
+        }
     }
 
     public int getShipLength(int start, int end) {
