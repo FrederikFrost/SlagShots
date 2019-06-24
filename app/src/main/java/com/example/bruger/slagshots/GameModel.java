@@ -24,10 +24,10 @@ public class GameModel {
         Log.i(TAG, "I made it in the GameModel constructer");
         playerTwoBoard = new BoardField[100];
         createBoardField(playerTwoBoard);
-        getTestBoard(playerTwoBoard);
+       // getTestBoard(playerTwoBoard);
         playerOneBoard = new BoardField[100];
         createBoardField(playerOneBoard);
-        getTestBoard2(playerOneBoard);
+        //getTestBoard2(playerOneBoard);
     }
 
     public int getCount() {
@@ -55,18 +55,22 @@ public class GameModel {
     }
 
     public void getTestBoard(BoardField[] board) {
+        board[3].hit();
         board[12].setShip(true);
         board[13].setShip(true);
         board[14].setShip(true);
         board[15].setShip(true);
+        board[15].hit();
         Log.i(TAG, "I inserted ship and shots");
     }
 
     public void getTestBoard2(BoardField[] board) {
+            board[55].hit();
             board[1].setShip(true);
             board[2].setShip(true);
             board[12].setShip(true);
             board[19].setShip(true);
+            board[19].hit();
             Log.i(TAG, "I inserted ship and shots");
     }
 
@@ -91,7 +95,7 @@ public class GameModel {
         }
     }
 
-    public boolean addShip(int start, int end) {
+    public ArrayList<BoardField> addShip(int start, int end) {
         //TODO: add ship
         Log.i("Place", "Skibet placeres");
         BoardField[] board = isPlayerOne? playerOneBoard:playerTwoBoard; //TODO: Maybe change this..?
@@ -108,13 +112,13 @@ public class GameModel {
             } else {
                 Log.i("Place", "Der var allerede et skib på " + i);
                 deleteShip(ship);
-                return false;
+                return null;
             }
 
             i = i+count;
         }
 
-        return true;
+        return ship;
     }
 
     public void deleteShip(ArrayList<BoardField> ship) {

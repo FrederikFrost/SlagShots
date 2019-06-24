@@ -41,14 +41,6 @@ public class HomeActivity extends AppCompatActivity {
         showStartDialog();
 
 
-       /* FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
-        fab.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
-                        .setAction("Action", null).show();
-            }
-        }); */
         Button opretSpilButton = (Button) findViewById(R.id.opret_spil_button);
         opretSpilButton.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -88,7 +80,7 @@ public class HomeActivity extends AppCompatActivity {
         editText.setSingleLine(true); //kun en linje for navn
         editText.setRawInputType(InputType.TYPE_TEXT_VARIATION_PERSON_NAME);
         InputFilter[] filters = new InputFilter[1];
-        filters[0] = new InputFilter.LengthFilter(11); //maksimal længde på navn er 15 characters
+        filters[0] = new InputFilter.LengthFilter(12); //maksimal længde på navn er 11 characters
         editText.setFilters(filters);
 
         AlertDialog dialog = new AlertDialog.Builder(this)
@@ -101,11 +93,11 @@ public class HomeActivity extends AppCompatActivity {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
                         inputName = editText.getText().toString();
-                        if (inputName != null && !inputName.trim().equals((""))) {
+                        if (inputName != null && !inputName.trim().equals(("")) && !inputName.substring(0,1).equals(" ")) {
                             dialog.dismiss();
                             TextView nameView = (TextView) findViewById(R.id.nameView);
                             nameView.setText(getResources().getString(R.string.title_activity_username) + "   " + inputName);
-                        } else if (inputName == null || inputName.trim().equals("") ||  inputName.substring(0,1).equals("")) {
+                        } else if (inputName == null || inputName.trim().equals("") ||  inputName.substring(0,1).equals(" ")) {
                             Toast.makeText(getApplicationContext(), "Dit navn må ikke være tomt eller starte med et mellemrum", Toast.LENGTH_SHORT).show();
                             showStartDialog();
 
@@ -140,10 +132,13 @@ public class HomeActivity extends AppCompatActivity {
     }
 
     private void opretSpil(){
-        Intent intent = new Intent(HomeActivity.this,NewGameActivity.class);
+        Intent intent = new Intent(HomeActivity.this,PrepGameActivity.class);
         intent.putExtra("inputName",inputName);
         intent.setFlags(intent.getFlags() | Intent.FLAG_ACTIVITY_NO_HISTORY);
+        intent.putExtra("isPlayerOne",true);
         startActivity(intent);
+
+
     }
 
     private void joinSpil(){
@@ -351,8 +346,6 @@ public class HomeActivity extends AppCompatActivity {
                 .setPositiveButton("LUK", new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
-                        Intent intent = new Intent(HomeActivity.this, HomeActivity.class);
-                        startActivity(intent);
                     }
                 })
                 .setNegativeButton("TILBAGE", new DialogInterface.OnClickListener() {
