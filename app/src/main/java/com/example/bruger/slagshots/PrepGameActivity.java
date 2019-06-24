@@ -53,7 +53,7 @@ public class PrepGameActivity extends AppCompatActivity {
         model = new GameModel(isPlayerOne);
 
         GridView gridView = (GridView) findViewById(R.id.gridView3);
-        mAdapter = new PrepGameAdapter(this, model);
+        mAdapter = new PrepGameAdapter(this, model,isPlayerOne);
         gridView.setAdapter(mAdapter);
 
 

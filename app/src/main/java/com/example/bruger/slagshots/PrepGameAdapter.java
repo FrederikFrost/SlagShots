@@ -11,11 +11,12 @@ public class PrepGameAdapter extends BaseAdapter {
     private Context mContext;
     private GameModel model;
     private int selectedPosition = -1;
+    private boolean isPlayerOne;
 
-
-    public PrepGameAdapter(Context c, GameModel model) {
+    public PrepGameAdapter(Context c, GameModel model, boolean isPlayerOne) {
         mContext = c;
         this.model = model;
+        this.isPlayerOne = isPlayerOne;
     }
 
     @Override
