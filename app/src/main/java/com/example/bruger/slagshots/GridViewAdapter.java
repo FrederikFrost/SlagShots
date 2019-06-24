@@ -59,7 +59,6 @@ public class GridViewAdapter extends BaseAdapter {
 
         if (convertView == null) {
             imageView = new SquareImageView(mContext);
-            //imageView.setPadding(0, 2, 0, 2);
         } else {
             imageView = (SquareImageView) convertView;
         }
