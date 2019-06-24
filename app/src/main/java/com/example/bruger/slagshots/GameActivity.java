@@ -459,10 +459,12 @@ public class GameActivity extends AppCompatActivity {
             public void onClick(View view) {
 
                 //check that it is the players turn
-                if (!isPlayersTurn(isPlayerOne)){
-                    Toast.makeText(getApplicationContext(),"Det er ikke din tur - vent venligst", Toast.LENGTH_LONG).show();
+                if (!isPlayersTurn(isPlayerOne)) {
+                    Toast.makeText(getApplicationContext(), "Det er ikke din tur - vent venligst", Toast.LENGTH_LONG).show();
                 } else if (!positionSelected) {
-                    Toast.makeText(getApplicationContext(),"Der er ikke valgt et felt at skyde på", Toast.LENGTH_LONG).show();
+                    Toast.makeText(getApplicationContext(), "Der er ikke valgt et felt at skyde på", Toast.LENGTH_LONG).show();
+                } else if(model.getPlayersBoardfieldAtPosition(adapter.getSelectedPosition(),!isPlayerOne).getHit()) {
+                    Toast.makeText(getApplicationContext(), "Der er allerede skudt her", Toast.LENGTH_LONG).show();
                 } else {
                     Log.i("SKUD", "Jeg affyrer skud.");
 

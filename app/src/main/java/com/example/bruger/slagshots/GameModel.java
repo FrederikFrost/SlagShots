@@ -122,23 +122,7 @@ public class GameModel {
     }
 
     public void deleteShip(ArrayList<BoardField> ship) {
-        /*
-        for (BoardField temp:ship) {
-            if (ship.size()!=1) {
-                temp.setShip(false);
-                ship.remove(temp);
-            } else {
-                temp.setShip(false);
-                ship.clear();
-            }
-        }
 
-        BoardField temp;
-        for (int i = 0; i < ship.size(); ++i) {
-            temp = ship.get(i);
-            temp.setShip(false);
-            ship.remove(temp);
-        }*/
         for (BoardField temp:ship) {
             temp.setShip(false);
         }
