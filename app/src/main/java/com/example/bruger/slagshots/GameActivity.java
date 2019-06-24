@@ -1,13 +1,20 @@
 package com.example.bruger.slagshots;
 
+import android.annotation.SuppressLint;
 import android.app.AlertDialog;
+import android.app.Notification;
+import android.app.NotificationChannel;
+import android.app.NotificationManager;
+import android.app.ProgressDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.graphics.Color;
 import android.media.MediaPlayer;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.VibrationEffect;
 import android.support.annotation.NonNull;
+import android.support.v4.app.NotificationCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.View;
@@ -44,6 +51,7 @@ public class GameActivity extends AppCompatActivity {
     private FirebaseDatabase mDatabaseRoot;
     private DatabaseReference mGamerooms;
     private DatabaseReference mGameroom;
+    private DatabaseReference checkIn;
 
     private ImageView mShipView;
     private ImageView mFireBallView;
@@ -61,6 +69,7 @@ public class GameActivity extends AppCompatActivity {
     private int turn = 1;
     private int nShipsHitPlayerOne = 0;
     private int nShipsHitPlayerTwo = 0;
+    private int clickclock = 0;
 
     private boolean gameDone = false;
     private boolean playerLeftGame = false;
@@ -69,6 +78,14 @@ public class GameActivity extends AppCompatActivity {
     private ValueEventListener playerTwoBoardListener;
     private ValueEventListener turnListener;
     private ValueEventListener playerLeftGameListener;
+
+    private boolean bothConnected = false;
+
+    private ArrayList<Integer> boardTemp;
+
+    private ProgressDialog progressDialog;
+
+    private NotificationCompat.Builder mBuilder = new NotificationCompat.Builder(this);
 
 
     @Override
@@ -91,15 +108,25 @@ public class GameActivity extends AppCompatActivity {
         mAnimationShoot = AnimationUtils.loadAnimation(this, R.anim.animation_shoot);
         mAnimationGotHit = AnimationUtils.loadAnimation(this, R.anim.animation_got_hit);
 
-        //init nShipsHit variable
-        hasBeenHit(playerOne);
-        hasBeenHit(playerTwo);
-
         //get ref to database from newGameActivity through the intent
         Intent intent = getIntent();
         gameroomName = intent.getStringExtra("GameroomName");
         isPlayerOne = intent.getBooleanExtra("isPlayerOne",false);
+        boardTemp = (ArrayList<Integer>) intent.getExtras().getSerializable("Board");
+
         model = new GameModel(isPlayerOne);
+
+        //sets the board from intent
+        if (isPlayerOne){
+            model.playerOneBoard = convertFromArrayListToBoardField(boardTemp);
+        } else {
+            model.playerTwoBoard = convertFromArrayListToBoardField(boardTemp);
+        }
+
+        //init nShipsHit variable
+        hasBeenHit(playerOne);
+        hasBeenHit(playerTwo);
+
         Log.i("Oliver","Got the following string from intent:"+gameroomName);
         Log.i("Oliver","I am player " + (isPlayerOne ?1:2));
 
@@ -107,6 +134,41 @@ public class GameActivity extends AppCompatActivity {
         mDatabaseRoot = FirebaseDatabase.getInstance();
         mGamerooms = mDatabaseRoot.getReference("GameRooms");
         mGameroom = mGamerooms.child(gameroomName);
+        checkIn = mGameroom.child("CheckIn");
+
+        checkIn.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                if (dataSnapshot.getValue() == null){
+                    checkIn.setValue("False");
+                    bothConnected = false;
+                } else {
+                    checkIn.setValue("True");
+                    bothConnected = true;
+                }
+            }
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+
+            }
+        });
+
+        checkIn.addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                if (dataSnapshot.getValue() != null) {
+                    if (dataSnapshot.getValue().toString().equals("True")) {
+                        progressDialog.dismiss();
+                        bothConnected = true;
+                    }
+                }
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+
+            }
+        });
 
         //set values of game variables
         mGameroom.child("Turn").setValue(1);
@@ -115,6 +177,17 @@ public class GameActivity extends AppCompatActivity {
 
         final String[] playerOneName = new String[1];
         final String[] playerTwoName = new String[1];
+
+        if (!bothConnected) {
+            progressDialog = new ProgressDialog(this);
+            // Setting Title
+            progressDialog.setTitle("Title");
+            progressDialog.setMessage("Waiting for the other player...");
+            progressDialog.setProgressStyle(ProgressDialog.STYLE_HORIZONTAL);
+            progressDialog.setProgressStyle(ProgressDialog.STYLE_SPINNER);
+            progressDialog.setCancelable(false);
+            progressDialog.show(); // Display Progress Dialog
+        }
 
         mGameroom.child("PlayerOne").addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
@@ -166,6 +239,7 @@ public class GameActivity extends AppCompatActivity {
                         mpExplosion.start();
                         mShipView.startAnimation(mAnimationGotHit);
                     } else {
+
                         Toast.makeText(getApplicationContext(), "Din modstander missede sit skud", Toast.LENGTH_SHORT).show();
                         mpSplash.start();
                     }
@@ -176,8 +250,12 @@ public class GameActivity extends AppCompatActivity {
                         vibrate();
                         mpExplosion.start();
                     } else {
-                        Toast.makeText(getApplicationContext(), "Du missede dit skud", Toast.LENGTH_SHORT).show();
-                        mpSplash.start();
+                        if (clickclock > 1) {
+                            Toast.makeText(getApplicationContext(), "Du missede dit skud", Toast.LENGTH_SHORT).show();
+                            mpSplash.start();
+                        } else {
+                            clickclock++;
+                        }
                     }
                 }
                 Log.i("Oliver", "Updated model.playerTwoBoard");
@@ -270,7 +348,9 @@ public class GameActivity extends AppCompatActivity {
                     gameDone = true;
                     finish();
                 } else if(isPlayersTurn(isPlayerOne)){
-                    Toast.makeText(getApplicationContext(),"Det er din tur!", Toast.LENGTH_SHORT).show();
+                    if (bothConnected) {
+                        Toast.makeText(getApplicationContext(), "Det er din tur!", Toast.LENGTH_SHORT).show();
+                    }
                 }
 
 
@@ -292,6 +372,7 @@ public class GameActivity extends AppCompatActivity {
                 if (dataSnapshot.exists() && dataSnapshot.getValue().toString().equals("TRUE")){
                     Toast.makeText(getApplicationContext(),"Din modstander har forladt spillet. Lukker ned.", Toast.LENGTH_LONG).show();
                     playerLeftGame = true;
+
                     finish();
                 }
             }
@@ -331,6 +412,9 @@ public class GameActivity extends AppCompatActivity {
 
                     //updates the board
                     model.getBoardfieldAtPosition(adapter.getSelectedPosition()).hit();
+
+                    //create message (test)
+                    //createMessage("whatever",false);
 
                     //converts and uploads the enemy's updated board to firebase
                     if (isPlayerOne) {
@@ -425,6 +509,36 @@ public class GameActivity extends AppCompatActivity {
         } else {
             finish();
         } */
+    }
+
+    private void createMessage(String message, boolean isToast){
+        if (isToast){
+            Toast.makeText(getApplicationContext(), message, Toast.LENGTH_LONG).show();
+        } else {
+            NotificationManager notificationManager = (NotificationManager) getSystemService(this.NOTIFICATION_SERVICE);
+            String NOTIFICATION_CHANNEL_ID = "slagShots";
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                @SuppressLint("WrongConstant") NotificationChannel notificationChannel = new NotificationChannel(NOTIFICATION_CHANNEL_ID, "My Notifications", NotificationManager.IMPORTANCE_MAX);
+                // Configure the notification channel.
+                notificationChannel.setDescription("Sample Channel description");
+                notificationChannel.enableLights(true);
+                notificationChannel.setLightColor(Color.RED);
+                //notificationChannel.setVibrationPattern(new long[]{0, 1000, 500, 1000});
+                //notificationChannel.enableVibration(true);
+                notificationManager.createNotificationChannel(notificationChannel);
+            }
+            NotificationCompat.Builder notificationBuilder = new NotificationCompat.Builder(this, NOTIFICATION_CHANNEL_ID);
+            notificationBuilder.setAutoCancel(true)
+                    .setDefaults(Notification.DEFAULT_ALL)
+                    .setWhen(System.currentTimeMillis())
+                    .setSmallIcon(R.mipmap.ic_launcher)
+                    .setTicker("Tutorialspoint")
+                    //.setPriority(Notification.PRIORITY_MAX)
+                    .setContentTitle("sample notification")
+                    .setContentText("This is sample notification")
+                    .setContentInfo("Information");
+            notificationManager.notify(1, notificationBuilder.build());
+        }
     }
 
     @NonNull

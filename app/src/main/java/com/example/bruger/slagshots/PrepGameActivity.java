@@ -55,7 +55,8 @@ public class PrepGameActivity extends AppCompatActivity {
                 Intent gameIntent = new Intent(PrepGameActivity.this, GameActivity.class);
                 gameIntent.putExtra("GameroomName",intent.getStringExtra("GameroomName"));
                 gameIntent.putExtra("isPlayerOne", isPlayerOne);
-                gameIntent.putExtra("Board",isPlayerOne? model.playerOneBoard:model.playerTwoBoard);
+                BoardField[] boardTemp = isPlayerOne? model.playerOneBoard:model.playerTwoBoard;
+                gameIntent.putExtra("Board",convertFromBoardFieldToArrayList(boardTemp));
                 startActivity(gameIntent);
             }
         });
@@ -195,5 +196,22 @@ public class PrepGameActivity extends AppCompatActivity {
     public void unRegisterShip(int shipLength){
         Log.i("Place", "Skibet afregistreres" );
         ships.remove(ships.indexOf(shipLength));
+    }
+
+    public ArrayList<Integer> convertFromBoardFieldToArrayList(BoardField[] playerBoard){
+        //converts from array to firebase-friendly data
+        ArrayList<Integer> temp = new ArrayList<Integer>();
+        for (BoardField bf: playerBoard){
+            if (!bf.getHit() && !bf.getShip()){
+                temp.add(0);
+            } else if (bf.getHit() && !bf.getShip()){
+                temp.add(1);
+            } else if (!bf.getHit() && bf.getShip()){
+                temp.add(2);
+            } else if (bf.getHit() && bf.getShip()){
+                temp.add(3);
+            }
+        }
+        return temp;
     }
 }
