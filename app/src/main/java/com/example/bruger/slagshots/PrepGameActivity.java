@@ -1,10 +1,16 @@
 package com.example.bruger.slagshots;
 
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
+import android.preference.DialogPreference;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
+import android.view.Gravity;
 import android.view.View;
+import android.view.ViewGroup;
+import android.view.WindowManager;
 import android.widget.AdapterView;
 import android.widget.Button;
 import android.widget.CompoundButton;
@@ -12,7 +18,9 @@ import android.widget.GridView;
 import android.widget.Toast;
 
 import java.util.ArrayList;
-
+import android.widget.ImageView;
+import android.widget.TextView;
+import android.widget.Toast;
 import android.widget.ToggleButton;
 
 public class PrepGameActivity extends AppCompatActivity {
@@ -23,6 +31,8 @@ public class PrepGameActivity extends AppCompatActivity {
     private boolean positionSelected;
     private boolean deleteShips = false;
     private ArrayList<Integer> ships = new ArrayList<Integer>();
+    private boolean submarineIsPlaced = false;
+
     private ArrayList<Ship> registeredShips = new ArrayList<Ship>();
 
     @Override
@@ -56,7 +66,8 @@ public class PrepGameActivity extends AppCompatActivity {
                 Intent gameIntent = new Intent(PrepGameActivity.this, GameActivity.class);
                 gameIntent.putExtra("GameroomName",intent.getStringExtra("GameroomName"));
                 gameIntent.putExtra("isPlayerOne", isPlayerOne);
-                gameIntent.putExtra("Board",isPlayerOne? model.playerOneBoard:model.playerTwoBoard);
+                BoardField[] boardTemp = isPlayerOne? model.playerOneBoard:model.playerTwoBoard;
+                gameIntent.putExtra("Board",convertFromBoardFieldToArrayList(boardTemp));
                 startActivity(gameIntent);
             }
         });
@@ -73,6 +84,18 @@ public class PrepGameActivity extends AppCompatActivity {
             }
         });
 
+        TextView shipsNotPlaced = findViewById(R.id.nonplaced_ships);
+        shipsNotPlaced.setText("Disse skibe er endnu ikke blevet placeret:");
+        TextView carrierShip = findViewById(R.id.carrier);
+        carrierShip.setText("Carrier (5 felter)");
+        TextView battleshipShip = findViewById(R.id.battleship);
+        battleshipShip.setText("Battleship (4 felter)");
+        TextView cruiserShip = findViewById(R.id.cruiser);
+        cruiserShip.setText("Cruiser (3 felter)");
+        TextView submarineShip = findViewById(R.id.submarine);
+        submarineShip.setText("Submarine (3 felter)");
+        TextView destroyerShip = findViewById(R.id.destroyer);
+        destroyerShip.setText("Destroyer (2 felter)");
     }
 
 
@@ -91,6 +114,29 @@ public class PrepGameActivity extends AppCompatActivity {
                 Log.i("Place", "Positionen er godkendt");
                 Ship ship = new Ship(getShipLength(mAdapter.getSelectedPosition(),position),model.addShip(mAdapter.getSelectedPosition(),position));
                 if (ship.getCoords() != null) {
+                    int shipLength = getShipLength(mAdapter.getSelectedPosition(), position);
+                    if (shipLength == 2) {
+                        TextView destroyerShip = findViewById(R.id.destroyer);
+                        destroyerShip.setVisibility(View.INVISIBLE);
+                        Toast.makeText(PrepGameActivity.this, "Din Destroyer (2 felter) er nu placeret", Toast.LENGTH_SHORT).show();
+                    } else if (shipLength == 3 && submarineIsPlaced == false) {
+                        TextView submarineShip = findViewById(R.id.submarine);
+                        submarineShip.setVisibility(View.INVISIBLE);
+                        submarineIsPlaced = true;
+                        Toast.makeText(PrepGameActivity.this, "Din Submarine (3 felter) er nu placeret", Toast.LENGTH_SHORT).show();
+                    } else if (shipLength == 3 && submarineIsPlaced == true) {
+                        TextView cruiserShip = findViewById(R.id.cruiser);
+                        cruiserShip.setVisibility(View.INVISIBLE);
+                        Toast.makeText(PrepGameActivity.this, "Din Cruiser (3 felter) er nu placeret", Toast.LENGTH_SHORT).show();
+                    } else if (shipLength == 4) {
+                        TextView battleshipShip = findViewById(R.id.battleship);
+                        battleshipShip.setVisibility(View.INVISIBLE);
+                        Toast.makeText(PrepGameActivity.this, "Dit Battleship (4 felter) er nu placeret", Toast.LENGTH_SHORT).show();
+                    } else if (shipLength == 5) {
+                        TextView carrierShip = findViewById(R.id.carrier);
+                        carrierShip.setVisibility(View.INVISIBLE);
+                        Toast.makeText(PrepGameActivity.this, "Din Carrier (5 felter) er nu placeret", Toast.LENGTH_SHORT).show();
+                    }
                     registeredShips.add(ship);
                     positionSelected=false;
                     mAdapter.setSelectedPosition(-1);
@@ -112,6 +158,7 @@ public class PrepGameActivity extends AppCompatActivity {
             positionSelected = false;
             mAdapter.setSelectedPosition(-1);
             mAdapter.notifyDataSetChanged();
+            Toast.makeText(getApplicationContext(), "Dette skib er allerede placeret, eller også har du placeret det forkert",Toast.LENGTH_SHORT).show();
         }
         Log.i("Place", "Action slut \n");
     }
@@ -156,7 +203,7 @@ public class PrepGameActivity extends AppCompatActivity {
         //checking placement
         if (!notEqual || !((sameRow && rowDis) || (sameCol && colDis))) {
             Log.i("Place", "Positionen er ikke godkendt i legalPosition");
-            Toast.makeText(getApplicationContext(), "Invalid placement",Toast.LENGTH_LONG).show();
+            Toast.makeText(getApplicationContext(), "Dette skib er allerede placeret, eller også har du placeret det forkert", Toast.LENGTH_SHORT).show();
             return false;
         } else { //
             int shipLength = getShipLength(lastPos, chosenPos);
@@ -169,7 +216,6 @@ public class PrepGameActivity extends AppCompatActivity {
     }
 
     public boolean checkRegistered(int shipLength) {
-
 
 
         for (int p:ships) {
@@ -216,5 +262,22 @@ public class PrepGameActivity extends AppCompatActivity {
     public void unRegisterShip(int shipLength){
         Log.i("Place", "Skibet afregistreres" );
         ships.remove(ships.indexOf(shipLength));
+    }
+
+    public ArrayList<Integer> convertFromBoardFieldToArrayList(BoardField[] playerBoard){
+        //converts from array to firebase-friendly data
+        ArrayList<Integer> temp = new ArrayList<Integer>();
+        for (BoardField bf: playerBoard){
+            if (!bf.getHit() && !bf.getShip()){
+                temp.add(0);
+            } else if (bf.getHit() && !bf.getShip()){
+                temp.add(1);
+            } else if (!bf.getHit() && bf.getShip()){
+                temp.add(2);
+            } else if (bf.getHit() && bf.getShip()){
+                temp.add(3);
+            }
+        }
+        return temp;
     }
 }

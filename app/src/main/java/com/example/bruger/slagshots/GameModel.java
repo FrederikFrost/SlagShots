@@ -24,7 +24,7 @@ public class GameModel {
         Log.i(TAG, "I made it in the GameModel constructer");
         playerTwoBoard = new BoardField[100];
         createBoardField(playerTwoBoard);
-        //getTestBoard(playerTwoBoard);
+       // getTestBoard(playerTwoBoard);
         playerOneBoard = new BoardField[100];
         createBoardField(playerOneBoard);
         //getTestBoard2(playerOneBoard);

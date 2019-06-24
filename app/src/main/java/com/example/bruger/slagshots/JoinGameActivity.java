@@ -65,7 +65,7 @@ public class JoinGameActivity extends AppCompatActivity {
                             if(!dataSnapshot.hasChild("GameRoom"+mGamePin[0]) || !dataSnapshot.child("GameRoom"+mGamePin[0])
                             .child("PlayerTwo").getValue().toString().equals("-1")){
                                 Log.i("SpilStart", "Spil kunne ikke startes med GamePin : "+mGamePin[0]);
-                                Toast.makeText(getApplicationContext(), "Spillet med gamepin " + gamePin + " kunne ikke findes.", Toast.LENGTH_LONG).show();
+                                Toast.makeText(getApplicationContext(), "Spillet med gamepin " + gamePinChecker + " kunne ikke findes.", Toast.LENGTH_LONG).show();
                                 return;
                             } else{
                                 mGameRoom = mGameRoomsRoot.child("GameRoom"+mGamePin[0]);
