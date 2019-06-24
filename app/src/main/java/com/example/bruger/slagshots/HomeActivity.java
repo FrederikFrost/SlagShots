@@ -142,12 +142,14 @@ public class HomeActivity extends AppCompatActivity {
     private void opretSpil(){
         Intent intent = new Intent(HomeActivity.this,NewGameActivity.class);
         intent.putExtra("inputName",inputName);
+        intent.setFlags(intent.getFlags() | Intent.FLAG_ACTIVITY_NO_HISTORY);
         startActivity(intent);
     }
 
     private void joinSpil(){
         Intent intent = new Intent(HomeActivity.this, JoinGameActivity.class);
         intent.putExtra("inputName",inputName);
+        intent.setFlags(intent.getFlags() | Intent.FLAG_ACTIVITY_NO_HISTORY);
         startActivity(intent);
     }
     private void skiftNavn(){

@@ -53,7 +53,7 @@ public class PrepGameAdapter extends BaseAdapter {
         } else {
             imageView = (SquareImageView) convertView;
         }
-        imageView.setImageResource(mThumbIds[model.getView(position)]);
+        imageView.setImageResource(mThumbIds[model.getView(position,isPlayerOne)]);
         if (position == selectedPosition) {
             Log.i("SKUD","Jeg sætter markerings farven");
             imageView.setColorFilter(Color.rgb(255,0,255));

@@ -34,8 +34,8 @@ public class GameModel {
         return playerTwoBoard.length;
     }
 
-    public BoardField getBoardfieldAtPosition(int pos) {
-        return isPlayerOne ? playerOneBoard[pos]: playerTwoBoard[pos];
+    public BoardField getPlayersBoardfieldAtPosition(int pos,boolean player) {
+        return player ? playerOneBoard[pos]: playerTwoBoard[pos];
     }
 
     public void setBoardfieldAtPosition(BoardField boardField, int pos) {
@@ -70,9 +70,9 @@ public class GameModel {
             Log.i(TAG, "I inserted ship and shots");
     }
 
-    public int getView(int pos) {
+    public int getView(int pos, boolean player) {
 
-        BoardField boardField = isPlayerOne ? playerOneBoard[pos]: playerTwoBoard[pos];
+        BoardField boardField = player ? playerOneBoard[pos]: playerTwoBoard[pos];
         if (boardField == null) {
             Log.i(TAG,DEBUGGER_STRING);
         }
@@ -100,7 +100,7 @@ public class GameModel {
         int count = row ? 1:10;
 
         for(int i = Math.min(start,end); i <= Math.max(start,end);) {
-            BoardField temp = getBoardfieldAtPosition(i);
+            BoardField temp = getPlayersBoardfieldAtPosition(i,isPlayerOne);
             if (!temp.getShip()) {
                 Log.i("Place", "Tilføjer ship part på " + i);
                 temp.setShip(true);

@@ -55,7 +55,7 @@ public class PrepGameActivity extends AppCompatActivity {
                 Intent gameIntent = new Intent(PrepGameActivity.this, GameActivity.class);
                 gameIntent.putExtra("GameroomName",intent.getStringExtra("GameroomName"));
                 gameIntent.putExtra("isPlayerOne", isPlayerOne);
-                BoardField[] boardTemp = isPlayerOne? model.playerOneBoard:model.playerTwoBoard;
+                BoardField[] boardTemp = isPlayerOne ? model.playerOneBoard : model.playerTwoBoard;
                 gameIntent.putExtra("Board",convertFromBoardFieldToArrayList(boardTemp));
                 startActivity(gameIntent);
             }

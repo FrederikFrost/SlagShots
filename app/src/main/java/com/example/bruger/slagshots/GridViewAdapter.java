@@ -18,8 +18,8 @@ public class GridViewAdapter extends BaseAdapter {
 
     private Context mContext;
     private GameModel model;
-    private boolean isPlayerOne;
     private boolean fogOfwar;
+    private boolean isPlayerOne;
     private int selectedPosition = -1;
 
 
@@ -65,9 +65,9 @@ public class GridViewAdapter extends BaseAdapter {
         }
 
         if (fogOfwar){
-            imageView.setImageResource(mThumbIdsFog[model.getView(position)]);
+            imageView.setImageResource(mThumbIdsFog[model.getView(position, isPlayerOne)]);
         } else {
-            imageView.setImageResource(mThumbIds[model.getView(position)]);
+            imageView.setImageResource(mThumbIds[model.getView(position, isPlayerOne)]);
         }
 
         if (position == selectedPosition) {

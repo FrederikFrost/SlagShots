@@ -74,6 +74,8 @@ public class GameActivity extends AppCompatActivity {
     private boolean gameDone = false;
     private boolean playerLeftGame = false;
 
+    private String state = "LOADING";
+
     private ValueEventListener playerOneBoardListener;
     private ValueEventListener playerTwoBoardListener;
     private ValueEventListener turnListener;
@@ -123,10 +125,6 @@ public class GameActivity extends AppCompatActivity {
             model.playerTwoBoard = convertFromArrayListToBoardField(boardTemp);
         }
 
-        //init nShipsHit variable
-        hasBeenHit(playerOne);
-        hasBeenHit(playerTwo);
-
         Log.i("Oliver","Got the following string from intent:"+gameroomName);
         Log.i("Oliver","I am player " + (isPlayerOne ?1:2));
 
@@ -145,6 +143,9 @@ public class GameActivity extends AppCompatActivity {
                 } else {
                     checkIn.setValue("True");
                     bothConnected = true;
+                    //init nShipsHit variable
+                    hasBeenHit(playerOne);
+                    hasBeenHit(playerTwo);
                 }
             }
             @Override
@@ -160,6 +161,9 @@ public class GameActivity extends AppCompatActivity {
                     if (dataSnapshot.getValue().toString().equals("True")) {
                         progressDialog.dismiss();
                         bothConnected = true;
+                        //init nShipsHit variable
+                        hasBeenHit(playerOne);
+                        hasBeenHit(playerTwo);
                     }
                 }
             }
@@ -172,8 +176,11 @@ public class GameActivity extends AppCompatActivity {
 
         //set values of game variables
         mGameroom.child("Turn").setValue(1);
-        mGameroom.child("PlayerOnesBoard").setValue(convertFromBoardFieldToArrayList(model.playerOneBoard));
-        mGameroom.child("PlayerTwosBoard").setValue(convertFromBoardFieldToArrayList(model.playerTwoBoard));
+        if (isPlayerOne) {
+            mGameroom.child("PlayerOnesBoard").setValue(convertFromBoardFieldToArrayList(model.playerOneBoard));
+        } else {
+            mGameroom.child("PlayerTwosBoard").setValue(convertFromBoardFieldToArrayList(model.playerTwoBoard));
+        }
 
         final String[] playerOneName = new String[1];
         final String[] playerTwoName = new String[1];
@@ -189,10 +196,12 @@ public class GameActivity extends AppCompatActivity {
             progressDialog.show(); // Display Progress Dialog
         }
 
-        mGameroom.child("PlayerOne").addListenerForSingleValueEvent(new ValueEventListener() {
+        mGameroom.child("PlayerOne").addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                playerOneName[0] = dataSnapshot.getValue().toString();
+                if (bothConnected) {
+                    playerOneName[0] = dataSnapshot.getValue().toString();
+                }
             }
 
             @Override
@@ -201,10 +210,12 @@ public class GameActivity extends AppCompatActivity {
             }
         });
 
-        mGameroom.child("PlayerTwo").addListenerForSingleValueEvent(new ValueEventListener() {
+        mGameroom.child("PlayerTwo").addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                playerTwoName[0] = dataSnapshot.getValue().toString();
+                if (bothConnected) {
+                    playerTwoName[0] = dataSnapshot.getValue().toString();
+                }
             }
 
             @Override
@@ -220,7 +231,7 @@ public class GameActivity extends AppCompatActivity {
 
                 //checks goal so not to display messages if game has ended
                 checkGoal();
-                if(gameDone || playerLeftGame){
+                if(gameDone || playerLeftGame || !bothConnected){
                     return;
                 }
 
@@ -274,7 +285,7 @@ public class GameActivity extends AppCompatActivity {
 
                 //checks goal so not to display messages if game has ended
                 checkGoal();
-                if(gameDone || playerLeftGame){
+                if(gameDone || playerLeftGame || !bothConnected){
                     return;
                 }
 
@@ -323,7 +334,7 @@ public class GameActivity extends AppCompatActivity {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
 
-                if(gameDone || playerLeftGame){
+                if(gameDone || playerLeftGame || !bothConnected){
                     return;
                 }
 
@@ -411,7 +422,7 @@ public class GameActivity extends AppCompatActivity {
                     Log.i("SKUD", "Jeg affyrer skud.");
 
                     //updates the board
-                    model.getBoardfieldAtPosition(adapter.getSelectedPosition()).hit();
+                    model.getPlayersBoardfieldAtPosition(adapter.getSelectedPosition(),!isPlayerOne).hit();
 
                     //create message (test)
                     //createMessage("whatever",false);

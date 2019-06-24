@@ -73,6 +73,7 @@ public class JoinGameActivity extends AppCompatActivity {
                                 Intent prepGameIntent = new Intent(getApplicationContext(), PrepGameActivity.class);
                                 prepGameIntent.putExtra("GameroomName","GameRoom"+mGamePin[0]);
                                 prepGameIntent.putExtra("isPlayerOne",false);
+                                prepGameIntent.setFlags(prepGameIntent.getFlags() | Intent.FLAG_ACTIVITY_NO_HISTORY);
                                 startActivity(prepGameIntent);
                                 Toast.makeText(getApplicationContext(), "Dit spil blev fundet. Held og lykke matros!", Toast.LENGTH_LONG).show();
                                 Log.i("SpilStart", "Spil startet med GameRoomID : "+mGamePin[0]);
