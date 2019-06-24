@@ -55,22 +55,18 @@ public class GameModel {
     }
 
     public void getTestBoard(BoardField[] board) {
-        board[3].hit();
         board[12].setShip(true);
         board[13].setShip(true);
         board[14].setShip(true);
         board[15].setShip(true);
-        board[15].hit();
         Log.i(TAG, "I inserted ship and shots");
     }
 
     public void getTestBoard2(BoardField[] board) {
-            board[55].hit();
             board[1].setShip(true);
             board[2].setShip(true);
             board[12].setShip(true);
             board[19].setShip(true);
-            board[19].hit();
             Log.i(TAG, "I inserted ship and shots");
     }
 

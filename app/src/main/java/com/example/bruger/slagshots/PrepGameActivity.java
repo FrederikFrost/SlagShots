@@ -13,6 +13,7 @@ import android.view.ViewGroup;
 import android.view.WindowManager;
 import android.widget.AdapterView;
 import android.widget.Button;
+import android.widget.CompoundButton;
 import android.widget.GridView;
 import android.widget.Toast;
 
@@ -28,6 +29,7 @@ public class PrepGameActivity extends AppCompatActivity {
     private PrepGameAdapter mAdapter;
     private boolean isPlayerOne;
     private boolean positionSelected;
+    private boolean deleteShips = false;
     private ArrayList<Integer> ships = new ArrayList<Integer>();
     private boolean submarineIsPlaced = false;
 
@@ -36,7 +38,7 @@ public class PrepGameActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_prep_game);
-        isPlayerOne = getIntent().getExtras().getBoolean("isPlayerOne", false);
+        isPlayerOne = getIntent().getExtras().getBoolean("isPlayerOne",false);
         model = new GameModel(isPlayerOne);
 
         GridView gridView = (GridView) findViewById(R.id.gridView3);
@@ -47,7 +49,11 @@ public class PrepGameActivity extends AppCompatActivity {
         gridView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                gridViewControl(position);
+                if (!deleteShips) {
+                    addShipSequence(position);
+                } else {
+                    deleteShipSequence(position);
+                }
             }
         });
 
@@ -55,14 +61,27 @@ public class PrepGameActivity extends AppCompatActivity {
         ready.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent intent = new Intent(getApplicationContext(), GameActivity.class);
-                intent.putExtra("isPlayerOne", isPlayerOne);
-                intent.putExtra("Board", isPlayerOne ? model.playerOneBoard : model.playerTwoBoard);
+                Intent intent = getIntent();
+                Intent gameIntent = new Intent(PrepGameActivity.this, GameActivity.class);
+                gameIntent.putExtra("GameroomName",intent.getStringExtra("GameroomName"));
+                gameIntent.putExtra("isPlayerOne", isPlayerOne);
+                BoardField[] boardTemp = isPlayerOne? model.playerOneBoard:model.playerTwoBoard;
+                gameIntent.putExtra("Board",convertFromBoardFieldToArrayList(boardTemp));
+                startActivity(gameIntent);
             }
         });
 
         ToggleButton delete = (ToggleButton) findViewById(R.id.delete_button);
-        //delete.setOnCheckedChangeListener();
+        delete.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                if (isChecked) {
+                    deleteShips = true;
+                } else {
+                    deleteShips = false;
+                }
+            }
+        });
 
         TextView shipsNotPlaced = findViewById(R.id.nonplaced_ships);
         shipsNotPlaced.setText("Disse skibe er endnu ikke blevet placeret:");
@@ -79,11 +98,11 @@ public class PrepGameActivity extends AppCompatActivity {
     }
 
 
-    private void gridViewControl(int position) {
-        Log.i("Place", "\n\nStarter action\n");
+    private void addShipSequence(int position) {
+        Log.i("Place","\n\nStarter action\n");
 
 
-        boolean invalid = false;
+        boolean invalid=false;
         if (!positionSelected) {
             positionSelected = true;
             mAdapter.setSelectedPosition(position);
@@ -121,7 +140,7 @@ public class PrepGameActivity extends AppCompatActivity {
                     mAdapter.notifyDataSetChanged();
                 } else {
                     //TODO: Unregister ship
-                    unRegisterShip(getShipLength(position, mAdapter.getSelectedPosition()));
+                    unRegisterShip(getShipLength(position,mAdapter.getSelectedPosition()));
                     Log.i("Place", "Placeres ikke, da der allerede fandtes et skib");
 
                     invalid = true;
@@ -140,6 +159,9 @@ public class PrepGameActivity extends AppCompatActivity {
         }
         Log.i("Place", "Action slut \n");
     }
+    private void deleteShipSequence(int pos) {
+
+    }
 
     public boolean legalPosition(int position) {
         //Set potential ship ends
@@ -149,10 +171,10 @@ public class PrepGameActivity extends AppCompatActivity {
 
         //Booleans for checking the placement
         boolean notEqual = lastPos != chosenPos;
-        boolean rowDis = (chosenPos <= lastPos + 4) && (lastPos - 4 <= chosenPos);
-        boolean colDis = (chosenPos <= lastPos + 40) && (lastPos - 40 <= chosenPos);
-        boolean sameRow = ((chosenPos % 10) <= (lastPos % 10) + 4) && ((lastPos % 10) - 4 <= (chosenPos % 10));
-        boolean sameCol = lastPos % 10 == chosenPos % 10;
+        boolean rowDis = (chosenPos <= lastPos+4)&&(lastPos-4 <= chosenPos);
+        boolean colDis = (chosenPos <= lastPos+40)&&(lastPos-40 <= chosenPos);
+        boolean sameRow = ((chosenPos%10) <= (lastPos%10)+4)&&((lastPos%10)-4 <= (chosenPos%10));
+        boolean sameCol = lastPos%10 == chosenPos%10;
 
         boolean validRow = sameRow && rowDis;
         boolean validCol = sameCol && colDis;
@@ -170,6 +192,7 @@ public class PrepGameActivity extends AppCompatActivity {
                 return false;
             }
         }
+
     }
 
     public boolean registerShip(int shipLength) {
@@ -219,5 +242,22 @@ public class PrepGameActivity extends AppCompatActivity {
     public void unRegisterShip(int shipLength){
         Log.i("Place", "Skibet afregistreres" );
         ships.remove(ships.indexOf(shipLength));
+    }
+
+    public ArrayList<Integer> convertFromBoardFieldToArrayList(BoardField[] playerBoard){
+        //converts from array to firebase-friendly data
+        ArrayList<Integer> temp = new ArrayList<Integer>();
+        for (BoardField bf: playerBoard){
+            if (!bf.getHit() && !bf.getShip()){
+                temp.add(0);
+            } else if (bf.getHit() && !bf.getShip()){
+                temp.add(1);
+            } else if (!bf.getHit() && bf.getShip()){
+                temp.add(2);
+            } else if (bf.getHit() && bf.getShip()){
+                temp.add(3);
+            }
+        }
+        return temp;
     }
 }
