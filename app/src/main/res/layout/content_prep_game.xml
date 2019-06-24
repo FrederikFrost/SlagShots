@@ -43,28 +43,129 @@
         android:verticalSpacing="2dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.5"
+        app:layout_constraintHorizontal_bias="0.492"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.70">
+        app:layout_constraintVertical_bias="0.781">
 
     </GridView>
 
     <ToggleButton
         android:id="@+id/delete_button"
         android:layout_width="140dp"
-        android:layout_height="60dp"
-        android:layout_marginTop="8dp"
-        android:layout_marginBottom="8dp"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="4dp"
+        android:background="@drawable/button_border"
         android:checked="false"
         android:text="ToggleButton"
+        android:textAlignment="center"
+        android:textColor="#fffb1c"
         android:textOff="Slet Skibe"
         android:textOn="Slet Skibe"
+        android:textSize="18sp"
+        android:textStyle="bold"
         app:layout_constraintBottom_toTopOf="@+id/gridView3"
         app:layout_constraintEnd_toEndOf="@+id/gridView3"
         app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintStart_toStartOf="@+id/gridView3"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.935" />
+        app:layout_constraintVertical_bias="0.898" />
+
+    <TextView
+        android:id="@+id/battleship"
+        android:layout_width="190dp"
+        android:layout_height="16dp"
+        android:layout_marginStart="109dp"
+        android:layout_marginEnd="109dp"
+        android:text="TextView"
+        android:textAlignment="center"
+        android:textColor="#fffb1c"
+        android:textSize="12.5sp"
+        android:textStyle="bold"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.0"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/carrier" />
+
+    <TextView
+        android:id="@+id/cruiser"
+        android:layout_width="190dp"
+        android:layout_height="16dp"
+        android:layout_marginStart="109dp"
+        android:layout_marginEnd="109dp"
+        android:text="TextView"
+        android:textAlignment="center"
+        android:textColor="#fffb1c"
+        android:textSize="12.5sp"
+        android:textStyle="bold"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.0"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/battleship" />
+
+    <TextView
+        android:id="@+id/submarine"
+        android:layout_width="190dp"
+        android:layout_height="16dp"
+        android:layout_marginStart="109dp"
+        android:layout_marginEnd="109dp"
+        android:text="TextView"
+        android:textAlignment="center"
+        android:textColor="#fffb1c"
+        android:textSize="12.5sp"
+        android:textStyle="bold"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.0"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/cruiser" />
+
+    <TextView
+        android:id="@+id/carrier"
+        android:layout_width="190dp"
+        android:layout_height="16dp"
+        android:layout_marginStart="109dp"
+        android:layout_marginEnd="109dp"
+        android:text="TextView"
+        android:textAlignment="center"
+        android:textColor="#fffb1c"
+        android:textSize="12.5sp"
+        android:textStyle="bold"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.0"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/nonplaced_ships" />
+
+    <TextView
+        android:id="@+id/destroyer"
+        android:layout_width="190dp"
+        android:layout_height="16dp"
+        android:layout_marginStart="109dp"
+        android:layout_marginEnd="109dp"
+        android:text="TextView"
+        android:textAlignment="center"
+        android:textColor="#fffb1c"
+        android:textSize="12.5sp"
+        android:textStyle="bold"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.0"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/submarine" />
+
+    <TextView
+        android:id="@+id/nonplaced_ships"
+        android:layout_width="277dp"
+        android:layout_height="18dp"
+        android:layout_marginStart="64dp"
+        android:layout_marginTop="4dp"
+        android:layout_marginEnd="109dp"
+        android:text="TextView"
+        android:textAlignment="center"
+        android:textColor="#fffb1c"
+        android:textSize="14sp"
+        android:textStyle="bold"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.0"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
 
 </android.support.constraint.ConstraintLayout>

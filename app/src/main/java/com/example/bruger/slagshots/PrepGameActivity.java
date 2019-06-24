@@ -29,12 +29,14 @@ public class PrepGameActivity extends AppCompatActivity {
     private boolean isPlayerOne;
     private boolean positionSelected;
     private ArrayList<Integer> ships = new ArrayList<Integer>();
+    private boolean submarineIsPlaced = false;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_prep_game);
-        isPlayerOne = getIntent().getExtras().getBoolean("isPlayerOne",false);
+        isPlayerOne = getIntent().getExtras().getBoolean("isPlayerOne", false);
         model = new GameModel(isPlayerOne);
 
         GridView gridView = (GridView) findViewById(R.id.gridView3);
@@ -55,21 +57,33 @@ public class PrepGameActivity extends AppCompatActivity {
             public void onClick(View v) {
                 Intent intent = new Intent(getApplicationContext(), GameActivity.class);
                 intent.putExtra("isPlayerOne", isPlayerOne);
-                intent.putExtra("Board",isPlayerOne? model.playerOneBoard:model.playerTwoBoard);
+                intent.putExtra("Board", isPlayerOne ? model.playerOneBoard : model.playerTwoBoard);
             }
         });
 
         ToggleButton delete = (ToggleButton) findViewById(R.id.delete_button);
         //delete.setOnCheckedChangeListener();
 
+        TextView shipsNotPlaced = findViewById(R.id.nonplaced_ships);
+        shipsNotPlaced.setText("Disse skibe er endnu ikke blevet placeret:");
+        TextView carrierShip = findViewById(R.id.carrier);
+        carrierShip.setText("Carrier (5 felter)");
+        TextView battleshipShip = findViewById(R.id.battleship);
+        battleshipShip.setText("Battleship (4 felter)");
+        TextView cruiserShip = findViewById(R.id.cruiser);
+        cruiserShip.setText("Cruiser (3 felter)");
+        TextView submarineShip = findViewById(R.id.submarine);
+        submarineShip.setText("Submarine (3 felter)");
+        TextView destroyerShip = findViewById(R.id.destroyer);
+        destroyerShip.setText("Destroyer (2 felter)");
     }
 
 
     private void gridViewControl(int position) {
-        Log.i("Place","\n\nStarter action\n");
+        Log.i("Place", "\n\nStarter action\n");
 
 
-        boolean invalid=false;
+        boolean invalid = false;
         if (!positionSelected) {
             positionSelected = true;
             mAdapter.setSelectedPosition(position);
@@ -78,13 +92,36 @@ public class PrepGameActivity extends AppCompatActivity {
         } else {
             if (legalPosition(position)) {
                 Log.i("Place", "Positionen er godkendt");
-                if (model.addShip(mAdapter.getSelectedPosition(),position)) {
-                    positionSelected=false;
+                if (model.addShip(mAdapter.getSelectedPosition(), position)) {
+                    int shipLength = getShipLength(mAdapter.getSelectedPosition(), position);
+                    if (shipLength == 2) {
+                        TextView destroyerShip = findViewById(R.id.destroyer);
+                        destroyerShip.setVisibility(View.INVISIBLE);
+                        Toast.makeText(PrepGameActivity.this, "Din Destroyer (2 felter) er nu placeret", Toast.LENGTH_SHORT).show();
+                    } else if (shipLength == 3 && submarineIsPlaced == false) {
+                        TextView submarineShip = findViewById(R.id.submarine);
+                        submarineShip.setVisibility(View.INVISIBLE);
+                        submarineIsPlaced = true;
+                        Toast.makeText(PrepGameActivity.this, "Din Submarine (3 felter) er nu placeret", Toast.LENGTH_SHORT).show();
+                    } else if (shipLength == 3 && submarineIsPlaced == true) {
+                        TextView cruiserShip = findViewById(R.id.cruiser);
+                        cruiserShip.setVisibility(View.INVISIBLE);
+                        Toast.makeText(PrepGameActivity.this, "Din Cruiser (3 felter) er nu placeret", Toast.LENGTH_SHORT).show();
+                    } else if (shipLength == 4) {
+                        TextView battleshipShip = findViewById(R.id.battleship);
+                        battleshipShip.setVisibility(View.INVISIBLE);
+                        Toast.makeText(PrepGameActivity.this, "Dit Battleship (4 felter) er nu placeret", Toast.LENGTH_SHORT).show();
+                    } else if (shipLength == 5) {
+                        TextView carrierShip = findViewById(R.id.carrier);
+                        carrierShip.setVisibility(View.INVISIBLE);
+                        Toast.makeText(PrepGameActivity.this, "Din Carrier (5 felter) er nu placeret", Toast.LENGTH_SHORT).show();
+                    }
+                    positionSelected = false;
                     mAdapter.setSelectedPosition(-1);
                     mAdapter.notifyDataSetChanged();
                 } else {
                     //TODO: Unregister ship
-                    unRegisterShip(getShipLength(position,mAdapter.getSelectedPosition()));
+                    unRegisterShip(getShipLength(position, mAdapter.getSelectedPosition()));
                     Log.i("Place", "Placeres ikke, da der allerede fandtes et skib");
 
                     invalid = true;
@@ -99,6 +136,7 @@ public class PrepGameActivity extends AppCompatActivity {
             positionSelected = false;
             mAdapter.setSelectedPosition(-1);
             mAdapter.notifyDataSetChanged();
+            Toast.makeText(getApplicationContext(), "Dette skib er allerede placeret, eller også har du placeret det forkert",Toast.LENGTH_SHORT).show();
         }
         Log.i("Place", "Action slut \n");
     }
@@ -111,10 +149,10 @@ public class PrepGameActivity extends AppCompatActivity {
 
         //Booleans for checking the placement
         boolean notEqual = lastPos != chosenPos;
-        boolean rowDis = (chosenPos <= lastPos+4)&&(lastPos-4 <= chosenPos);
-        boolean colDis = (chosenPos <= lastPos+40)&&(lastPos-40 <= chosenPos);
-        boolean sameRow = ((chosenPos%10) <= (lastPos%10)+4)&&((lastPos%10)-4 <= (chosenPos%10));
-        boolean sameCol = lastPos%10 == chosenPos%10;
+        boolean rowDis = (chosenPos <= lastPos + 4) && (lastPos - 4 <= chosenPos);
+        boolean colDis = (chosenPos <= lastPos + 40) && (lastPos - 40 <= chosenPos);
+        boolean sameRow = ((chosenPos % 10) <= (lastPos % 10) + 4) && ((lastPos % 10) - 4 <= (chosenPos % 10));
+        boolean sameCol = lastPos % 10 == chosenPos % 10;
 
         boolean validRow = sameRow && rowDis;
         boolean validCol = sameCol && colDis;
@@ -122,7 +160,7 @@ public class PrepGameActivity extends AppCompatActivity {
         //checking placement
         if (!notEqual || !((sameRow && rowDis) || (sameCol && colDis))) {
             Log.i("Place", "Positionen er ikke godkendt i legalPosition");
-            Toast.makeText(getApplicationContext(), "Invalid placement",Toast.LENGTH_LONG).show();
+            Toast.makeText(getApplicationContext(), "Ugyldig placering af dit skib", Toast.LENGTH_SHORT).show();
             return false;
         } else { //
             int shipLength = getShipLength(lastPos, chosenPos);
@@ -132,7 +170,6 @@ public class PrepGameActivity extends AppCompatActivity {
                 return false;
             }
         }
-
     }
 
     public boolean registerShip(int shipLength) {
