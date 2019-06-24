@@ -65,9 +65,9 @@ public class GridViewAdapter extends BaseAdapter {
         }
 
         if (fogOfwar){
-            imageView.setImageResource(mThumbIdsFog[model.getView(position,isPlayerOne)]);
+            imageView.setImageResource(mThumbIdsFog[model.getView(position)]);
         } else {
-            imageView.setImageResource(mThumbIds[model.getView(position,isPlayerOne)]);
+            imageView.setImageResource(mThumbIds[model.getView(position)]);
         }
 
         if (position == selectedPosition) {

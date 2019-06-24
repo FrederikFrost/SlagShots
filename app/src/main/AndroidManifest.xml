@@ -2,6 +2,8 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.example.bruger.slagshots">
 
+    <uses-permission android:name="android.permission.VIBRATE"/>
+
     <supports-screens
         android:anyDensity="true"
         android:largeScreens="true"

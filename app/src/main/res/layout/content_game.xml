@@ -68,6 +68,27 @@
             android:layout_alignLeft="@+id/gridView2"
             android:layout_alignStart="@+id/gridView2" />
 
+        <ImageView
+            android:id="@+id/fireball"
+            android:layout_width="300dp"
+            android:layout_height="300dp"
+            android:layout_above="@+id/fireShot"
+            android:layout_marginEnd="0dp"
+            android:layout_marginBottom="0dp"
+            android:layout_toStartOf="@+id/gridView1"
+            android:src="@drawable/fireball"
+            android:visibility="invisible" />
+
+        <ImageView
+            android:id="@+id/slagskib"
+            android:layout_width="300dp"
+            android:layout_height="300dp"
+            android:layout_above="@+id/fireShot"
+            android:layout_marginEnd="0dp"
+            android:layout_marginBottom="0dp"
+            android:layout_toStartOf="@+id/gridView1"
+            android:src="@drawable/battleship"
+            android:visibility="visible" />
 
 
 

@@ -1,21 +1,26 @@
 package com.example.bruger.slagshots;
 
-import android.annotation.SuppressLint;
-import android.content.Context;
+import android.app.AlertDialog;
+import android.content.DialogInterface;
 import android.content.Intent;
+import android.media.MediaPlayer;
+import android.os.Build;
 import android.os.Bundle;
+import android.os.VibrationEffect;
 import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.View;
-import android.view.ViewGroup;
+import android.view.animation.Animation;
+import android.view.animation.AnimationUtils;
 import android.widget.AdapterView;
 import android.widget.Button;
 import android.widget.GridView;
 import android.widget.AdapterView.OnItemClickListener;
+import android.widget.ImageView;
 import android.widget.Toast;
+import android.os.Vibrator;
 
-import com.google.firebase.database.ChildEventListener;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
@@ -24,42 +29,77 @@ import com.google.firebase.database.GenericTypeIndicator;
 import com.google.firebase.database.ValueEventListener;
 
 import java.util.ArrayList;
-import java.util.Arrays;
-
-import static java.lang.Boolean.FALSE;
-import static java.lang.Boolean.TRUE;
 
 
 public class GameActivity extends AppCompatActivity {
 
     private GameModel model;
     private boolean positionSelected = false;
+
     private boolean isPlayerOne;
+    private boolean playerOne = true;
+    private boolean playerTwo = false;
 
     private String gameroomName;
     private FirebaseDatabase mDatabaseRoot;
     private DatabaseReference mGamerooms;
     private DatabaseReference mGameroom;
 
+    private ImageView mShipView;
+    private ImageView mFireBallView;
+    private Animation mAnimationShoot;
+    private Animation mAnimationGotHit;
+
+    private Vibrator vibrator;
+
+    private MediaPlayer mpCannon;
+    private MediaPlayer mpExplosion;
+    private MediaPlayer mpSplash;
+
     GridViewAdapter adapter2;
 
     private int turn = 1;
+    private int nShipsHitPlayerOne = 0;
+    private int nShipsHitPlayerTwo = 0;
 
     private boolean gameDone = false;
     private boolean playerLeftGame = false;
+
+    private ValueEventListener playerOneBoardListener;
+    private ValueEventListener playerTwoBoardListener;
+    private ValueEventListener turnListener;
+    private ValueEventListener playerLeftGameListener;
 
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
 
         super.onCreate(savedInstanceState);
-        model = new GameModel();
         setContentView(R.layout.activity_game);
+
+        //init vibrator
+        vibrator = (Vibrator) getSystemService(this.VIBRATOR_SERVICE);
+
+        //init mediaplayer
+        final MediaPlayer mpCannon = MediaPlayer.create(this, R.raw.cannon_new);
+        final MediaPlayer mpExplosion = MediaPlayer.create(this, R.raw.explosion);
+        final MediaPlayer mpSplash = MediaPlayer.create(this, R.raw.splash);
+
+        //load animations
+        mFireBallView = (ImageView) findViewById(R.id.fireball);
+        mShipView = (ImageView) findViewById(R.id.slagskib);
+        mAnimationShoot = AnimationUtils.loadAnimation(this, R.anim.animation_shoot);
+        mAnimationGotHit = AnimationUtils.loadAnimation(this, R.anim.animation_got_hit);
+
+        //init nShipsHit variable
+        hasBeenHit(playerOne);
+        hasBeenHit(playerTwo);
 
         //get ref to database from newGameActivity through the intent
         Intent intent = getIntent();
         gameroomName = intent.getStringExtra("GameroomName");
         isPlayerOne = intent.getBooleanExtra("isPlayerOne",false);
+        model = new GameModel(isPlayerOne);
         Log.i("Oliver","Got the following string from intent:"+gameroomName);
         Log.i("Oliver","I am player " + (isPlayerOne ?1:2));
 
@@ -70,8 +110,8 @@ public class GameActivity extends AppCompatActivity {
 
         //set values of game variables
         mGameroom.child("Turn").setValue(1);
-        mGameroom.child("PlayerOnesBoard").setValue(convertFromBoardFieldToArrayList(model.playerTwoBoard));
-        mGameroom.child("PlayerTwosBoard").setValue(convertFromBoardFieldToArrayList(model.playerOneBoard));
+        mGameroom.child("PlayerOnesBoard").setValue(convertFromBoardFieldToArrayList(model.playerOneBoard));
+        mGameroom.child("PlayerTwosBoard").setValue(convertFromBoardFieldToArrayList(model.playerTwoBoard));
 
         final String[] playerOneName = new String[1];
         final String[] playerTwoName = new String[1];
@@ -101,19 +141,46 @@ public class GameActivity extends AppCompatActivity {
         });
 
         //create listener that updates player one's board
-        mGameroom.child("PlayerOnesBoard").addValueEventListener(new ValueEventListener() {
+        playerOneBoardListener = mGameroom.child("PlayerOnesBoard").addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+
+                //checks goal so not to display messages if game has ended
+                checkGoal();
                 if(gameDone || playerLeftGame){
                     return;
                 }
+
                 //converts data back to BoardField array
-                GenericTypeIndicator<ArrayList<Integer>> t = new GenericTypeIndicator<ArrayList<Integer>>() {};
+                GenericTypeIndicator<ArrayList<Integer>> t = new GenericTypeIndicator<ArrayList<Integer>>() {
+                };
                 ArrayList<Integer> temp = dataSnapshot.getValue(t);
                 //updates the board
-                model.playerTwoBoard = convertFromArrayListToBoardField(temp);
+                model.playerOneBoard = convertFromArrayListToBoardField(temp);
 
-                Log.i("Oliver","Updated model.playerTwoBoard");
+                if (isPlayerOne) {
+                    //if you has been hit
+                    if (hasBeenHit(playerOne)) {
+                        Toast.makeText(getApplicationContext(), "Dit skib er blevet ramt!", Toast.LENGTH_SHORT).show();
+                        vibrate();
+                        mpExplosion.start();
+                        mShipView.startAnimation(mAnimationGotHit);
+                    } else {
+                        Toast.makeText(getApplicationContext(), "Din modstander missede sit skud", Toast.LENGTH_SHORT).show();
+                        mpSplash.start();
+                    }
+                } else {
+                    //if enemy has been hit
+                    if (hasBeenHit(playerOne)) {
+                        Toast.makeText(getApplicationContext(), "Du ramte din modstanders skib!", Toast.LENGTH_SHORT).show();
+                        vibrate();
+                        mpExplosion.start();
+                    } else {
+                        Toast.makeText(getApplicationContext(), "Du missede dit skud", Toast.LENGTH_SHORT).show();
+                        mpSplash.start();
+                    }
+                }
+                Log.i("Oliver", "Updated model.playerTwoBoard");
             }
 
             @Override
@@ -123,17 +190,46 @@ public class GameActivity extends AppCompatActivity {
         });
 
         //create listener that updates player two's board
-        mGameroom.child("PlayerTwosBoard").addValueEventListener(new ValueEventListener() {
+        playerTwoBoardListener = mGameroom.child("PlayerTwosBoard").addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+
+                //checks goal so not to display messages if game has ended
+                checkGoal();
                 if(gameDone || playerLeftGame){
                     return;
                 }
+
                 //converts data back to BoardField array
                 GenericTypeIndicator<ArrayList<Integer>> t = new GenericTypeIndicator<ArrayList<Integer>>() {};
                 ArrayList<Integer> temp = dataSnapshot.getValue(t);
                 //updates the board
-                model.playerOneBoard = convertFromArrayListToBoardField(temp);
+                model.playerTwoBoard = convertFromArrayListToBoardField(temp);
+
+                //checking for player two
+                if (!isPlayerOne) {
+                    //if you has been hit
+                    if (hasBeenHit(playerTwo)) {
+                        Toast.makeText(getApplicationContext(), "Dit skib er blevet ramt!", Toast.LENGTH_SHORT).show();
+                        vibrate();
+                        mpExplosion.start();
+                        mShipView.startAnimation(mAnimationGotHit);
+                    } else {
+                        Toast.makeText(getApplicationContext(), "Din modstander missede sit skud", Toast.LENGTH_SHORT).show();
+                        mpSplash.start();
+                    }
+                } else {
+                    //if enemy has been hit
+                    if (hasBeenHit(playerTwo)) {
+                        Toast.makeText(getApplicationContext(), "Du ramte din modstanders skib!", Toast.LENGTH_SHORT).show();
+                        vibrate();
+                        mpExplosion.start();
+                    } else {
+                        Toast.makeText(getApplicationContext(), "Du missede dit skud", Toast.LENGTH_SHORT).show();
+                        mpSplash.start();
+                    }
+                }
+
 
                 Log.i("Oliver","Updated model.playerOneBoard");
             }
@@ -145,12 +241,14 @@ public class GameActivity extends AppCompatActivity {
         });
 
         //create listener for turn variable. This code will be run at the start of each turn
-        mGameroom.child("Turn").addValueEventListener(new ValueEventListener() {
+        turnListener = mGameroom.child("Turn").addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+
                 if(gameDone || playerLeftGame){
                     return;
                 }
+
                 //recieve turn variable
                 turn = Integer.parseInt(dataSnapshot.getValue().toString());
 
@@ -170,13 +268,10 @@ public class GameActivity extends AppCompatActivity {
                         Toast.makeText(getApplicationContext(), playerOneName[0] +" har vundet!!", Toast.LENGTH_SHORT).show();
                     }
                     gameDone = true;
-                    mGameroom.removeValue();
                     finish();
                 } else if(isPlayersTurn(isPlayerOne)){
                     Toast.makeText(getApplicationContext(),"Det er din tur!", Toast.LENGTH_SHORT).show();
                 }
-
-
 
 
                 Log.i("Oliver","We got the turn value "+turn);
@@ -189,20 +284,16 @@ public class GameActivity extends AppCompatActivity {
         });
 
         //Create listener that checks if a player left the game.
-        mGameroom.child("PlayerLeftGame").addValueEventListener(new ValueEventListener() {
+        playerLeftGameListener = mGameroom.child("PlayerLeftGame").addValueEventListener(new ValueEventListener() {
+
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                if(playerLeftGame || gameDone){
-                    finish();
-                } else if (dataSnapshot.exists() && dataSnapshot.getValue().toString().equals("TRUE")){
-                    playerLeftGame = true;
-                    Toast.makeText(getApplicationContext(),"Din modstander har forladt spillet. Lukker ned.", Toast.LENGTH_LONG).show();
-                    mGameroom.removeValue();
-                    finish();
-                } else{
-                    return;
-                }
 
+                if (dataSnapshot.exists() && dataSnapshot.getValue().toString().equals("TRUE")){
+                    Toast.makeText(getApplicationContext(),"Din modstander har forladt spillet. Lukker ned.", Toast.LENGTH_LONG).show();
+                    playerLeftGame = true;
+                    finish();
+                }
             }
 
             @Override
@@ -212,12 +303,15 @@ public class GameActivity extends AppCompatActivity {
         });
 
         //arranging the layout and creating adapters
+
+        //creating view for the smaller board, that is the players own board
         GridView gridView1 = (GridView) findViewById(R.id.gridView1);
-        adapter2 = new GridViewAdapter(this, model, !isPlayerOne, false);
+        adapter2 = new GridViewAdapter(this, model, isPlayerOne, false);
         gridView1.setAdapter(adapter2);
 
+        //creating the view for the bigger board, that is the enemy's board
         final GridView gridView2 = (GridView) findViewById(R.id.gridView2);
-        final GridViewAdapter adapter = new GridViewAdapter(this, model, isPlayerOne, true);
+        final GridViewAdapter adapter = new GridViewAdapter(this, model, !isPlayerOne, true);
         gridView2.setAdapter(adapter);
         gridView2.setOnItemClickListener(getListener(adapter));
 
@@ -236,16 +330,24 @@ public class GameActivity extends AppCompatActivity {
                     Log.i("SKUD", "Jeg affyrer skud.");
 
                     //updates the board
-                    model.getBoardfieldAtPosition(adapter.getSelectedPosition(), isPlayerOne).hit();
+                    model.getBoardfieldAtPosition(adapter.getSelectedPosition()).hit();
 
-                    //converts and uploads the board to firebase
+                    //converts and uploads the enemy's updated board to firebase
                     if (isPlayerOne) {
-                        mGameroom.child("PlayerOnesBoard").setValue(convertFromBoardFieldToArrayList(model.playerTwoBoard));
+                        mGameroom.child("PlayerTwosBoard").setValue(convertFromBoardFieldToArrayList(model.playerTwoBoard));
                         mGameroom.child("Turn").setValue(2);
                     } else {
-                        mGameroom.child("PlayerTwosBoard").setValue(convertFromBoardFieldToArrayList(model.playerOneBoard));
+                        mGameroom.child("PlayerOnesBoard").setValue(convertFromBoardFieldToArrayList(model.playerOneBoard));
                         mGameroom.child("Turn").setValue(1);
                     }
+
+                    //plays shoot animation
+                    mFireBallView.setVisibility(View.VISIBLE);
+                    mFireBallView.startAnimation(mAnimationShoot);
+                    mFireBallView.setVisibility(View.INVISIBLE);
+
+                    //play cannon sound
+                    mpCannon.start();
 
                     //resets the selected position
                     adapter.setSelectedPosition(-1);
@@ -260,31 +362,53 @@ public class GameActivity extends AppCompatActivity {
     }
 
     @Override
-    protected void onDestroy() {
-        super.onDestroy();
-        if(gameDone){
-            finish();
-        } else {
-            gameDone = true;
-            if(!playerLeftGame){
-                playerLeftGame = true;
-                mGameroom.child("PlayerLeftGame").addListenerForSingleValueEvent(new ValueEventListener() {
-                    @Override
-                    public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                     mGameroom.child("PlayerLeftGame").setValue("TRUE");
-                        Toast.makeText(getApplicationContext(),"Du har forladt spillet. Lukker ned.", Toast.LENGTH_LONG).show();
+    public void onBackPressed() {
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setMessage("Are you sure you want to exit?")
+                .setCancelable(false)
+                .setPositiveButton("Yes", new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int id) {
                         finish();
                     }
-
-                    @Override
-                    public void onCancelled(@NonNull DatabaseError databaseError) {
-
+                })
+                .setNegativeButton("No", new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int id) {
+                        dialog.cancel();
                     }
-            });
-        }
-            finish();
-        }
+                });
+        AlertDialog alert = builder.create();
+        alert.show();
+    }
 
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+
+        Log.i("Oliver",isPlayerOne+", destroying listeners");
+        mGameroom.removeEventListener(playerOneBoardListener);
+        mGameroom.removeEventListener(playerTwoBoardListener);
+        mGameroom.removeEventListener(turnListener);
+        mGameroom.removeEventListener(playerLeftGameListener);
+
+        if (!playerLeftGame) { //if you are first player to exit game
+            playerLeftGame = true;
+            mGameroom.child("PlayerLeftGame").addListenerForSingleValueEvent(new ValueEventListener() {
+                @Override
+                public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                    mGameroom.child("PlayerLeftGame").setValue("TRUE");
+                    Toast.makeText(getApplicationContext(), "Du har forladt spillet.", Toast.LENGTH_LONG).show();
+                    return;
+                }
+
+                @Override
+                public void onCancelled(@NonNull DatabaseError databaseError) {
+                }
+            });
+        } else { // if last player to exit game
+            //delete gameroom
+            mGameroom.removeValue();
+            return;
+        }
 
 
         /*if(!gameDone && mGameroom.child("PlayerLeftGame").getKey().equals("FALSE")){
@@ -396,5 +520,43 @@ public class GameActivity extends AppCompatActivity {
         }
 
         return 0;
+    }
+
+    private boolean hasBeenHit(boolean player){
+        int newNShipsHit = 0;
+        BoardField[] playerBoard;
+        if (player == playerOne) {
+            playerBoard = model.playerOneBoard;
+        } else {
+            playerBoard = model.playerTwoBoard;
+        }
+
+        for (BoardField bf : playerBoard){
+            if (bf.getShip() && bf.getHit()){
+                newNShipsHit++;
+            }
+        }
+
+        if (player == playerOne) {
+            if (newNShipsHit > nShipsHitPlayerOne) {
+                nShipsHitPlayerOne = newNShipsHit;
+                return true;
+            }
+        } else {
+            if (newNShipsHit > nShipsHitPlayerTwo) {
+                nShipsHitPlayerTwo = newNShipsHit;
+                return true;
+            }
+        }
+        return false;
+    }
+
+    private void vibrate(){
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            vibrator.vibrate(VibrationEffect.createOneShot(500, VibrationEffect.DEFAULT_AMPLITUDE));
+        } else {
+            //deprecated in API 26
+            vibrator.vibrate(500);
+        }
     }
 }
