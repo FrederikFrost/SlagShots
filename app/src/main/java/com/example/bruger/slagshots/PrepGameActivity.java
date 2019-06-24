@@ -1,25 +1,18 @@
 package com.example.bruger.slagshots;
 
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
-import android.preference.DialogPreference;
-import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
-import android.view.Gravity;
 import android.view.View;
-import android.view.ViewGroup;
-import android.view.WindowManager;
 import android.widget.AdapterView;
 import android.widget.Button;
+import android.widget.CompoundButton;
 import android.widget.GridView;
 import android.widget.Toast;
 
 import java.util.ArrayList;
-import android.widget.ImageView;
-import android.widget.TextView;
-import android.widget.Toast;
+
 import android.widget.ToggleButton;
 
 public class PrepGameActivity extends AppCompatActivity {
@@ -28,6 +21,7 @@ public class PrepGameActivity extends AppCompatActivity {
     private PrepGameAdapter mAdapter;
     private boolean isPlayerOne;
     private boolean positionSelected;
+    private boolean deleteShips = false;
     private ArrayList<Integer> ships = new ArrayList<Integer>();
 
     @Override
@@ -45,7 +39,11 @@ public class PrepGameActivity extends AppCompatActivity {
         gridView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                gridViewControl(position);
+                if (!deleteShips) {
+                    addShipSequence(position);
+                } else {
+                    deleteShipSequence(position);
+                }
             }
         });
 
@@ -53,19 +51,31 @@ public class PrepGameActivity extends AppCompatActivity {
         ready.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent intent = new Intent(getApplicationContext(), GameActivity.class);
-                intent.putExtra("isPlayerOne", isPlayerOne);
-                intent.putExtra("Board",isPlayerOne? model.playerOneBoard:model.playerTwoBoard);
+                Intent intent = getIntent();
+                Intent gameIntent = new Intent(PrepGameActivity.this, GameActivity.class);
+                gameIntent.putExtra("GameroomName",intent.getStringExtra("GameroomName"));
+                gameIntent.putExtra("isPlayerOne", isPlayerOne);
+                gameIntent.putExtra("Board",isPlayerOne? model.playerOneBoard:model.playerTwoBoard);
+                startActivity(gameIntent);
             }
         });
 
         ToggleButton delete = (ToggleButton) findViewById(R.id.delete_button);
-        //delete.setOnCheckedChangeListener();
+        delete.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                if (isChecked) {
+                    deleteShips = true;
+                } else {
+                    deleteShips = false;
+                }
+            }
+        });
 
     }
 
 
-    private void gridViewControl(int position) {
+    private void addShipSequence(int position) {
         Log.i("Place","\n\nStarter action\n");
 
 
@@ -103,6 +113,10 @@ public class PrepGameActivity extends AppCompatActivity {
         Log.i("Place", "Action slut \n");
     }
 
+    private void deleteShipSequence(int pos) {
+
+    }
+
     public boolean legalPosition(int position) {
         //Set potential ship ends
         int lastPos = mAdapter.getSelectedPosition();
@@ -132,7 +146,6 @@ public class PrepGameActivity extends AppCompatActivity {
                 return false;
             }
         }
-
     }
 
     public boolean registerShip(int shipLength) {

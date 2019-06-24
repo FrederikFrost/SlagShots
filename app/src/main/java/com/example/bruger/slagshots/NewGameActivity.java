@@ -132,10 +132,10 @@ public class NewGameActivity extends AppCompatActivity {
         if(PlayerTwoJoined){
             spilStartet = true;
 
-            Intent newGameIntent = new Intent(getApplicationContext(), GameActivity.class);
-            newGameIntent.putExtra("GameroomName","GameRoom"+mGamePin[0]);
-            newGameIntent.putExtra("isPlayerOne",true);
-            startActivity(newGameIntent);
+            Intent prepGameIntent = new Intent(getApplicationContext(), PrepGameActivity.class);
+            prepGameIntent.putExtra("GameroomName","GameRoom"+mGamePin[0]);
+            prepGameIntent.putExtra("isPlayerOne",true);
+            startActivity(prepGameIntent);
 
         } else {
             Toast.makeText(getApplicationContext(),"Mangler en modstander", Toast.LENGTH_SHORT).show();
