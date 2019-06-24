@@ -72,13 +72,18 @@ public class PrepGameActivity extends AppCompatActivity {
         ready.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent intent = getIntent();
-                Intent gameIntent = new Intent(PrepGameActivity.this, GameActivity.class);
-                gameIntent.putExtra("GameroomName",intent.getStringExtra("GameroomName"));
-                gameIntent.putExtra("isPlayerOne", isPlayerOne);
-                BoardField[] boardTemp = isPlayerOne ? model.playerOneBoard : model.playerTwoBoard;
-                gameIntent.putExtra("Board",convertFromBoardFieldToArrayList(boardTemp));
-                startActivity(gameIntent);
+                if(registeredShips.size() == 5){
+                    Intent intent = getIntent();
+                    Intent gameIntent = new Intent(PrepGameActivity.this, GameActivity.class);
+                    gameIntent.putExtra("GameroomName",intent.getStringExtra("GameroomName"));
+                    gameIntent.putExtra("isPlayerOne", isPlayerOne);
+                    BoardField[] boardTemp = isPlayerOne ? model.playerOneBoard : model.playerTwoBoard;
+                    gameIntent.putExtra("Board",convertFromBoardFieldToArrayList(boardTemp));
+                    startActivity(gameIntent);
+                } else {
+                    Toast.makeText(PrepGameActivity.this, "Du skal placere alle dine skibe!", Toast.LENGTH_SHORT).show();
+                }
+
             }
         });
 
