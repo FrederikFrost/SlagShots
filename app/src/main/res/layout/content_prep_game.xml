@@ -27,19 +27,6 @@
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintVertical_bias="0.9" />
 
-    <Button
-        android:id="@+id/deleteButton"
-        android:layout_width="140dp"
-        android:layout_height="wrap_content"
-        android:layout_marginBottom="4dp"
-        android:text="Slet Skib"
-        app:layout_constraintBottom_toTopOf="@+id/gridView3"
-        app:layout_constraintEnd_toEndOf="@+id/gridView3"
-        app:layout_constraintHorizontal_bias="0.0"
-        app:layout_constraintStart_toStartOf="@+id/gridView3"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.9" />
-
     <GridView
         android:id="@+id/gridView3"
         android:layout_width="330dp"
@@ -63,24 +50,21 @@
 
     </GridView>
 
-    <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-        android:id="@+id/linearLayout"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:layout_marginBottom="62dp"
-        android:orientation="horizontal"
-        android:padding="10dp"
-        app:layout_constraintBottom_toTopOf="@+id/instructions_button"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent">
-
-        <TextView
-            android:id="@+id/txtCustomToast"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center"
-            android:gravity="center_horizontal" />
-    </LinearLayout>
+    <ToggleButton
+        android:id="@+id/delete_button"
+        android:layout_width="140dp"
+        android:layout_height="60dp"
+        android:layout_marginTop="8dp"
+        android:layout_marginBottom="8dp"
+        android:checked="false"
+        android:text="ToggleButton"
+        android:textOff="Slet Skibe"
+        android:textOn="Slet Skibe"
+        app:layout_constraintBottom_toTopOf="@+id/gridView3"
+        app:layout_constraintEnd_toEndOf="@+id/gridView3"
+        app:layout_constraintHorizontal_bias="0.0"
+        app:layout_constraintStart_toStartOf="@+id/gridView3"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.935" />
 
 </android.support.constraint.ConstraintLayout>

@@ -20,6 +20,7 @@ import java.util.ArrayList;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
+import android.widget.ToggleButton;
 
 public class PrepGameActivity extends AppCompatActivity {
 
@@ -54,8 +55,12 @@ public class PrepGameActivity extends AppCompatActivity {
             public void onClick(View v) {
                 Intent intent = new Intent(getApplicationContext(), GameActivity.class);
                 intent.putExtra("isPlayerOne", isPlayerOne);
+                intent.putExtra("Board",isPlayerOne? model.playerOneBoard:model.playerTwoBoard);
             }
         });
+
+        ToggleButton delete = (ToggleButton) findViewById(R.id.delete_button);
+        //delete.setOnCheckedChangeListener();
 
     }
 
