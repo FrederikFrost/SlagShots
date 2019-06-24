@@ -58,7 +58,7 @@ public class PrepGameActivity extends AppCompatActivity {
         });
 
     }
-}
+
 
     private void gridViewControl(int position) {
         Log.i("Place","\n\nStarter action\n");
