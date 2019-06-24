@@ -2,6 +2,7 @@ package com.example.bruger.slagshots;
 
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.graphics.Color;
 import android.os.Bundle;
 import android.preference.DialogPreference;
 import android.support.v7.app.AlertDialog;
@@ -23,6 +24,8 @@ import android.widget.TextView;
 import android.widget.Toast;
 import android.widget.ToggleButton;
 
+import org.w3c.dom.Text;
+
 public class PrepGameActivity extends AppCompatActivity {
 
     private GameModel model;
@@ -31,7 +34,16 @@ public class PrepGameActivity extends AppCompatActivity {
     private boolean positionSelected;
     private boolean deleteShips = false;
     private boolean submarineIsPlaced = false;
+    private boolean cruiserIsPlaced = false;
+    private boolean submarineIsDeleted = false;
+    private boolean cruiserIsDeleted = false;
     private ArrayList<Ship> registeredShips = new ArrayList<Ship>();
+    private TextView shipsNotPlaced;
+    private TextView destroyerShip;
+    private TextView submarineShip;
+    private TextView cruiserShip;
+    private TextView battleshipShip;
+    private TextView carrierShip;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -70,29 +82,31 @@ public class PrepGameActivity extends AppCompatActivity {
             }
         });
 
-        ToggleButton delete = (ToggleButton) findViewById(R.id.delete_button);
+        final ToggleButton delete = (ToggleButton) findViewById(R.id.delete_button);
         delete.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             @Override
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
                 if (isChecked) {
                     deleteShips = true;
+                    delete.setBackgroundResource(R.drawable.button_border_2);
                 } else {
                     deleteShips = false;
+                    delete.setBackgroundResource(R.drawable.button_border);
                 }
             }
         });
 
-        TextView shipsNotPlaced = findViewById(R.id.nonplaced_ships);
+        shipsNotPlaced = findViewById(R.id.nonplaced_ships);
         shipsNotPlaced.setText("Disse skibe er endnu ikke blevet placeret:");
-        TextView carrierShip = findViewById(R.id.carrier);
+        carrierShip = findViewById(R.id.carrier);
+        destroyerShip = findViewById(R.id.destroyer);
+        cruiserShip = findViewById(R.id.cruiser);
+        battleshipShip = findViewById(R.id.battleship);
+        submarineShip = findViewById(R.id.submarine);
         carrierShip.setText("Carrier (5 felter)");
-        TextView battleshipShip = findViewById(R.id.battleship);
         battleshipShip.setText("Battleship (4 felter)");
-        TextView cruiserShip = findViewById(R.id.cruiser);
         cruiserShip.setText("Cruiser (3 felter)");
-        TextView submarineShip = findViewById(R.id.submarine);
         submarineShip.setText("Submarine (3 felter)");
-        TextView destroyerShip = findViewById(R.id.destroyer);
         destroyerShip.setText("Destroyer (2 felter)");
     }
 
@@ -114,26 +128,28 @@ public class PrepGameActivity extends AppCompatActivity {
                 if (ship.getCoords() != null) {
                     int shipLength = getShipLength(mAdapter.getSelectedPosition(), position);
                     if (shipLength == 2) {
-                        TextView destroyerShip = findViewById(R.id.destroyer);
                         destroyerShip.setVisibility(View.INVISIBLE);
                         Toast.makeText(PrepGameActivity.this, "Din Destroyer (2 felter) er nu placeret", Toast.LENGTH_SHORT).show();
-                    } else if (shipLength == 3 && submarineIsPlaced == false) {
-                        TextView submarineShip = findViewById(R.id.submarine);
+                    } else if (shipLength == 3 && !submarineIsPlaced) {
                         submarineShip.setVisibility(View.INVISIBLE);
                         submarineIsPlaced = true;
+                        submarineIsDeleted = false;
                         Toast.makeText(PrepGameActivity.this, "Din Submarine (3 felter) er nu placeret", Toast.LENGTH_SHORT).show();
-                    } else if (shipLength == 3 && submarineIsPlaced == true) {
-                        TextView cruiserShip = findViewById(R.id.cruiser);
+                    } else if (shipLength == 3 && submarineIsPlaced && !cruiserIsPlaced) {
                         cruiserShip.setVisibility(View.INVISIBLE);
+                        cruiserIsPlaced = true;
+                        cruiserIsDeleted = false;
                         Toast.makeText(PrepGameActivity.this, "Din Cruiser (3 felter) er nu placeret", Toast.LENGTH_SHORT).show();
                     } else if (shipLength == 4) {
-                        TextView battleshipShip = findViewById(R.id.battleship);
                         battleshipShip.setVisibility(View.INVISIBLE);
                         Toast.makeText(PrepGameActivity.this, "Dit Battleship (4 felter) er nu placeret", Toast.LENGTH_SHORT).show();
                     } else if (shipLength == 5) {
-                        TextView carrierShip = findViewById(R.id.carrier);
                         carrierShip.setVisibility(View.INVISIBLE);
                         Toast.makeText(PrepGameActivity.this, "Din Carrier (5 felter) er nu placeret", Toast.LENGTH_SHORT).show();
+                    }
+                    if(carrierShip.getVisibility() == View.INVISIBLE && battleshipShip.getVisibility() == View.INVISIBLE && submarineShip.getVisibility() == View.INVISIBLE
+                    && cruiserShip.getVisibility() == View.INVISIBLE && destroyerShip.getVisibility() == View.INVISIBLE) {
+                        shipsNotPlaced.setText("Alle dine skibe er nu placeret! Tryk på KLAR");
                     }
                     registeredShips.add(ship);
                     positionSelected=false;
@@ -172,9 +188,37 @@ public class PrepGameActivity extends AppCompatActivity {
         }
 
         if (temp != null) {
+            if(temp.getShipLength() == 2) {
+                destroyerShip.setVisibility(View.VISIBLE);
+                Toast.makeText(getApplicationContext(),"Din Destroyer (2 felter) er nu slettet", Toast.LENGTH_SHORT).show();
+            }
+            else  if(temp.getShipLength() == 3 && !submarineIsDeleted) {
+                submarineIsDeleted = true;
+                submarineIsPlaced = false;
+                submarineShip.setVisibility(View.VISIBLE);
+                Toast.makeText(getApplicationContext(),"Din Submarine (3 felter) er nu slettet", Toast.LENGTH_SHORT).show();
+            }
+            else  if(temp.getShipLength() == 3 && !cruiserIsDeleted) {
+                cruiserIsDeleted = true;
+                cruiserIsPlaced = false;
+                cruiserShip.setVisibility(View.VISIBLE);
+                Toast.makeText(getApplicationContext(),"Din Cruiser (3 felter) er nu slettet", Toast.LENGTH_SHORT).show();
+            }
+            else if(temp.getShipLength() == 4) {
+                battleshipShip.setVisibility(View.VISIBLE);
+                Toast.makeText(getApplicationContext(),"Dit Battleship (4 felter) er nu slettet", Toast.LENGTH_SHORT).show();
+            }
+            else if(temp.getShipLength() == 5) {
+                carrierShip.setVisibility(View.VISIBLE);
+                Toast.makeText(getApplicationContext(),"Din Carrier (5 felter) er nu slettet", Toast.LENGTH_SHORT).show();
+            }
+            if(carrierShip.getVisibility() == View.INVISIBLE || battleshipShip.getVisibility() == View.INVISIBLE || submarineShip.getVisibility() == View.INVISIBLE
+            || cruiserShip.getVisibility() == View.INVISIBLE || destroyerShip.getVisibility() == View.INVISIBLE) {
+                shipsNotPlaced.setText("Disse skibe mangler at blive placeret:");
+            }
             model.deleteShip(temp.getCoords());
             registeredShips.remove(temp);
-        } else Toast.makeText(getApplicationContext(),"Ship not found", Toast.LENGTH_LONG).show();
+        } else Toast.makeText(getApplicationContext(),"Skibet du ønsker at slette, eksisterer ikke", Toast.LENGTH_SHORT).show();
 
         mAdapter.notifyDataSetChanged();
 
