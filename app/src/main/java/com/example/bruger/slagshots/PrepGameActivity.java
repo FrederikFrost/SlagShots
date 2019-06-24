@@ -164,7 +164,7 @@ public class PrepGameActivity extends AppCompatActivity {
         Ship temp = null;
         for (Ship s: registeredShips) {
             for (BoardField b: s.getCoords()) {
-                if (model.getBoardfieldAtPosition(pos).equals(b)) {
+                if (model.getPlayersBoardfieldAtPosition(pos, isPlayerOne).equals(b)) {
                     temp = s;
                     break;
                 }

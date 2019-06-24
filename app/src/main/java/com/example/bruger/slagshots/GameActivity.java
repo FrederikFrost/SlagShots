@@ -51,7 +51,11 @@ public class GameActivity extends AppCompatActivity {
     private FirebaseDatabase mDatabaseRoot;
     private DatabaseReference mGamerooms;
     private DatabaseReference mGameroom;
-    private DatabaseReference checkIn;
+    private DatabaseReference checkInOne;
+    private DatabaseReference checkInTwo;
+
+    private boolean playerOneReady = false;
+    private boolean playerTwoReady = false;
 
     private ImageView mShipView;
     private ImageView mFireBallView;
@@ -114,11 +118,11 @@ public class GameActivity extends AppCompatActivity {
         Intent intent = getIntent();
         gameroomName = intent.getStringExtra("GameroomName");
         isPlayerOne = intent.getBooleanExtra("isPlayerOne",false);
+        //get own board
         boardTemp = (ArrayList<Integer>) intent.getExtras().getSerializable("Board");
-
         model = new GameModel(isPlayerOne);
 
-        //sets the board from intent
+        //get own board from intent
         if (isPlayerOne){
             model.playerOneBoard = convertFromArrayListToBoardField(boardTemp);
         } else {
@@ -132,59 +136,27 @@ public class GameActivity extends AppCompatActivity {
         mDatabaseRoot = FirebaseDatabase.getInstance();
         mGamerooms = mDatabaseRoot.getReference("GameRooms");
         mGameroom = mGamerooms.child(gameroomName);
-        checkIn = mGameroom.child("CheckIn");
+        checkInOne = mGameroom.child("CheckInOne");
+        checkInTwo = mGameroom.child("CheckInTwo");
 
-        checkIn.addListenerForSingleValueEvent(new ValueEventListener() {
-            @Override
-            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                if (dataSnapshot.getValue() == null){
-                    checkIn.setValue("False");
-                    bothConnected = false;
-                } else {
-                    checkIn.setValue("True");
-                    bothConnected = true;
-                    //init nShipsHit variable
-                    hasBeenHit(playerOne);
-                    hasBeenHit(playerTwo);
-                }
-            }
-            @Override
-            public void onCancelled(@NonNull DatabaseError databaseError) {
-
-            }
-        });
-
-        checkIn.addValueEventListener(new ValueEventListener() {
-            @Override
-            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                if (dataSnapshot.getValue() != null) {
-                    if (dataSnapshot.getValue().toString().equals("True")) {
-                        progressDialog.dismiss();
-                        bothConnected = true;
-                        //init nShipsHit variable
-                        hasBeenHit(playerOne);
-                        hasBeenHit(playerTwo);
-                    }
-                }
-            }
-
-            @Override
-            public void onCancelled(@NonNull DatabaseError databaseError) {
-
-            }
-        });
-
-        //set values of game variables
+        //sets turn variable
         mGameroom.child("Turn").setValue(1);
+        mGameroom.child("PlayerOnesBoard");
+        mGameroom.child("PlayerTwosBoard");
+
+        //upload board
         if (isPlayerOne) {
             mGameroom.child("PlayerOnesBoard").setValue(convertFromBoardFieldToArrayList(model.playerOneBoard));
+            checkInOne.setValue("True");
         } else {
             mGameroom.child("PlayerTwosBoard").setValue(convertFromBoardFieldToArrayList(model.playerTwoBoard));
+            checkInTwo.setValue("True");
         }
 
         final String[] playerOneName = new String[1];
         final String[] playerTwoName = new String[1];
 
+        //pause screen while waiting for other to connect
         if (!bothConnected) {
             progressDialog = new ProgressDialog(this);
             // Setting Title
@@ -196,31 +168,72 @@ public class GameActivity extends AppCompatActivity {
             progressDialog.show(); // Display Progress Dialog
         }
 
+        checkInOne.addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                if (dataSnapshot.getValue() != null) {
+                    if (dataSnapshot.getValue().toString().equals("True")) {
+                        /*
+                        playerOneReady = true;
+                        bothConnected = playerOneReady && playerTwoReady;
+                        if (bothConnected){
+                            progressDialog.dismiss();
+                            updateBoard(isPlayerOne);
+                            updateBoard(!isPlayerOne);
+                        }
+                        */
+                    }
+                }
+            }
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+            }
+        });
+
+        checkInTwo.addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                if (dataSnapshot.getValue() != null) {
+                    if (dataSnapshot.getValue().toString().equals("True")) {
+                        /*
+                        playerTwoReady = true;
+                        bothConnected = playerOneReady && playerTwoReady;
+                        if(bothConnected){
+                            progressDialog.dismiss();
+                            updateBoard(isPlayerOne);
+                            updateBoard(!isPlayerOne);
+                        }
+                        */
+
+                    }
+                }
+            }
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+            }
+        });
+
         mGameroom.child("PlayerOne").addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                if (bothConnected) {
+                if (dataSnapshot.getValue() != null) {
                     playerOneName[0] = dataSnapshot.getValue().toString();
                 }
             }
-
             @Override
             public void onCancelled(@NonNull DatabaseError databaseError) {
-
             }
         });
 
         mGameroom.child("PlayerTwo").addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                if (bothConnected) {
+                if (dataSnapshot.getValue() != null) {
                     playerTwoName[0] = dataSnapshot.getValue().toString();
                 }
             }
-
             @Override
             public void onCancelled(@NonNull DatabaseError databaseError) {
-
             }
         });
 
@@ -229,9 +242,18 @@ public class GameActivity extends AppCompatActivity {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
 
+                if (dataSnapshot.getValue() != null){
+                    playerOneReady = true;
+                    bothConnected = playerOneReady && playerTwoReady;
+                }
+
+                if (!bothConnected){
+                    return;
+                }
+
                 //checks goal so not to display messages if game has ended
                 checkGoal();
-                if(gameDone || playerLeftGame || !bothConnected){
+                if(gameDone || playerLeftGame){
                     return;
                 }
 
@@ -283,9 +305,18 @@ public class GameActivity extends AppCompatActivity {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
 
+                if (dataSnapshot.getValue() != null){
+                    playerTwoReady = true;
+                    bothConnected = playerOneReady && playerTwoReady;
+                }
+
+                if (!bothConnected){
+                    return;
+                }
+
                 //checks goal so not to display messages if game has ended
                 checkGoal();
-                if(gameDone || playerLeftGame || !bothConnected){
+                if(gameDone || playerLeftGame){
                     return;
                 }
 
@@ -674,6 +705,48 @@ public class GameActivity extends AppCompatActivity {
             }
         }
         return false;
+    }
+
+    private void updateBoard(boolean player){
+        if (player){
+            //create listener that updates player one's board
+            mGameroom.child("PlayerOnesBoard").addListenerForSingleValueEvent(new ValueEventListener() {
+                @Override
+                public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                    //converts data back to BoardField array
+                    GenericTypeIndicator<ArrayList<Integer>> t = new GenericTypeIndicator<ArrayList<Integer>>() {
+                    };
+                    ArrayList<Integer> temp = dataSnapshot.getValue(t);
+                    //updates the board
+                    model.playerOneBoard = convertFromArrayListToBoardField(temp);
+
+                    Log.i("Oliver", "Updated model.playerOneBoard");
+                }
+                @Override
+                public void onCancelled(@NonNull DatabaseError databaseError) {
+
+                }
+            });
+        } else {
+            //create listener that updates player one's board
+            mGameroom.child("PlayerTwoBoard").addListenerForSingleValueEvent(new ValueEventListener() {
+                @Override
+                public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                    //converts data back to BoardField array
+                    GenericTypeIndicator<ArrayList<Integer>> t = new GenericTypeIndicator<ArrayList<Integer>>() {
+                    };
+                    ArrayList<Integer> temp = dataSnapshot.getValue(t);
+                    //updates the board
+                    model.playerTwoBoard = convertFromArrayListToBoardField(temp);
+
+                    Log.i("Oliver", "Updated model.playerTwoBoard");
+                }
+                @Override
+                public void onCancelled(@NonNull DatabaseError databaseError) {
+
+                }
+            });
+        }
     }
 
     private void vibrate(){

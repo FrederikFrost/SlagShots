@@ -132,7 +132,7 @@ public class HomeActivity extends AppCompatActivity {
     }
 
     private void opretSpil(){
-        Intent intent = new Intent(HomeActivity.this,PrepGameActivity.class);
+        Intent intent = new Intent(HomeActivity.this,NewGameActivity.class);
         intent.putExtra("inputName",inputName);
         intent.setFlags(intent.getFlags() | Intent.FLAG_ACTIVITY_NO_HISTORY);
         intent.putExtra("isPlayerOne",true);
