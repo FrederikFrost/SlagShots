@@ -2,9 +2,6 @@ package com.example.bruger.slagshots;
 
 import android.annotation.SuppressLint;
 import android.app.AlertDialog;
-import android.app.Notification;
-import android.app.NotificationChannel;
-import android.app.NotificationManager;
 import android.app.ProgressDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -14,7 +11,6 @@ import android.os.Build;
 import android.os.Bundle;
 import android.os.VibrationEffect;
 import android.support.annotation.NonNull;
-import android.support.v4.app.NotificationCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.View;
@@ -73,7 +69,6 @@ public class GameActivity extends AppCompatActivity {
     private int turn = 1;
     private int nShipsHitPlayerOne = 0;
     private int nShipsHitPlayerTwo = 0;
-    private int clickclock = 0;
 
     private boolean gameDone = false;
     private boolean playerLeftGame = false;
@@ -86,12 +81,11 @@ public class GameActivity extends AppCompatActivity {
     private ValueEventListener playerLeftGameListener;
 
     private boolean bothConnected = false;
+    private boolean progressDialogRunning = true;
 
     private ArrayList<Integer> boardTemp;
 
     private ProgressDialog progressDialog;
-
-    private NotificationCompat.Builder mBuilder = new NotificationCompat.Builder(this);
 
 
     @Override
@@ -251,6 +245,11 @@ public class GameActivity extends AppCompatActivity {
                     return;
                 }
 
+                if (progressDialogRunning){
+                    progressDialogRunning = false;
+                    progressDialog.dismiss();
+                }
+
                 //checks goal so not to display messages if game has ended
                 checkGoal();
                 if(gameDone || playerLeftGame){
@@ -283,12 +282,8 @@ public class GameActivity extends AppCompatActivity {
                         vibrate();
                         mpExplosion.start();
                     } else {
-                        if (clickclock > 1) {
-                            Toast.makeText(getApplicationContext(), "Du missede dit skud", Toast.LENGTH_SHORT).show();
-                            mpSplash.start();
-                        } else {
-                            clickclock++;
-                        }
+                        Toast.makeText(getApplicationContext(), "Du missede dit skud", Toast.LENGTH_SHORT).show();
+                        mpSplash.start();
                     }
                 }
                 Log.i("Oliver", "Updated model.playerTwoBoard");
@@ -312,6 +307,11 @@ public class GameActivity extends AppCompatActivity {
 
                 if (!bothConnected){
                     return;
+                }
+
+                if (progressDialogRunning){
+                    progressDialogRunning = false;
+                    progressDialog.dismiss();
                 }
 
                 //checks goal so not to display messages if game has ended
@@ -455,9 +455,6 @@ public class GameActivity extends AppCompatActivity {
                     //updates the board
                     model.getPlayersBoardfieldAtPosition(adapter.getSelectedPosition(),!isPlayerOne).hit();
 
-                    //create message (test)
-                    //createMessage("whatever",false);
-
                     //converts and uploads the enemy's updated board to firebase
                     if (isPlayerOne) {
                         mGameroom.child("PlayerTwosBoard").setValue(convertFromBoardFieldToArrayList(model.playerTwoBoard));
@@ -551,36 +548,6 @@ public class GameActivity extends AppCompatActivity {
         } else {
             finish();
         } */
-    }
-
-    private void createMessage(String message, boolean isToast){
-        if (isToast){
-            Toast.makeText(getApplicationContext(), message, Toast.LENGTH_LONG).show();
-        } else {
-            NotificationManager notificationManager = (NotificationManager) getSystemService(this.NOTIFICATION_SERVICE);
-            String NOTIFICATION_CHANNEL_ID = "slagShots";
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-                @SuppressLint("WrongConstant") NotificationChannel notificationChannel = new NotificationChannel(NOTIFICATION_CHANNEL_ID, "My Notifications", NotificationManager.IMPORTANCE_MAX);
-                // Configure the notification channel.
-                notificationChannel.setDescription("Sample Channel description");
-                notificationChannel.enableLights(true);
-                notificationChannel.setLightColor(Color.RED);
-                //notificationChannel.setVibrationPattern(new long[]{0, 1000, 500, 1000});
-                //notificationChannel.enableVibration(true);
-                notificationManager.createNotificationChannel(notificationChannel);
-            }
-            NotificationCompat.Builder notificationBuilder = new NotificationCompat.Builder(this, NOTIFICATION_CHANNEL_ID);
-            notificationBuilder.setAutoCancel(true)
-                    .setDefaults(Notification.DEFAULT_ALL)
-                    .setWhen(System.currentTimeMillis())
-                    .setSmallIcon(R.mipmap.ic_launcher)
-                    .setTicker("Tutorialspoint")
-                    //.setPriority(Notification.PRIORITY_MAX)
-                    .setContentTitle("sample notification")
-                    .setContentText("This is sample notification")
-                    .setContentInfo("Information");
-            notificationManager.notify(1, notificationBuilder.build());
-        }
     }
 
     @NonNull
