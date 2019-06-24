@@ -38,6 +38,7 @@ public class PrepGameActivity extends AppCompatActivity {
     private boolean submarineIsDeleted = false;
     private boolean cruiserIsDeleted = false;
     private ArrayList<Ship> registeredShips = new ArrayList<Ship>();
+    private TextView shipsNotPlaced;
     private TextView destroyerShip;
     private TextView submarineShip;
     private TextView cruiserShip;
@@ -95,7 +96,7 @@ public class PrepGameActivity extends AppCompatActivity {
             }
         });
 
-        TextView shipsNotPlaced = findViewById(R.id.nonplaced_ships);
+        shipsNotPlaced = findViewById(R.id.nonplaced_ships);
         shipsNotPlaced.setText("Disse skibe er endnu ikke blevet placeret:");
         carrierShip = findViewById(R.id.carrier);
         destroyerShip = findViewById(R.id.destroyer);
@@ -127,29 +128,28 @@ public class PrepGameActivity extends AppCompatActivity {
                 if (ship.getCoords() != null) {
                     int shipLength = getShipLength(mAdapter.getSelectedPosition(), position);
                     if (shipLength == 2) {
-                        TextView destroyerShip = findViewById(R.id.destroyer);
                         destroyerShip.setVisibility(View.INVISIBLE);
                         Toast.makeText(PrepGameActivity.this, "Din Destroyer (2 felter) er nu placeret", Toast.LENGTH_SHORT).show();
                     } else if (shipLength == 3 && !submarineIsPlaced) {
-                        TextView submarineShip = findViewById(R.id.submarine);
                         submarineShip.setVisibility(View.INVISIBLE);
                         submarineIsPlaced = true;
                         submarineIsDeleted = false;
                         Toast.makeText(PrepGameActivity.this, "Din Submarine (3 felter) er nu placeret", Toast.LENGTH_SHORT).show();
                     } else if (shipLength == 3 && submarineIsPlaced && !cruiserIsPlaced) {
-                        TextView cruiserShip = findViewById(R.id.cruiser);
                         cruiserShip.setVisibility(View.INVISIBLE);
                         cruiserIsPlaced = true;
                         cruiserIsDeleted = false;
                         Toast.makeText(PrepGameActivity.this, "Din Cruiser (3 felter) er nu placeret", Toast.LENGTH_SHORT).show();
                     } else if (shipLength == 4) {
-                        TextView battleshipShip = findViewById(R.id.battleship);
                         battleshipShip.setVisibility(View.INVISIBLE);
                         Toast.makeText(PrepGameActivity.this, "Dit Battleship (4 felter) er nu placeret", Toast.LENGTH_SHORT).show();
                     } else if (shipLength == 5) {
-                        TextView carrierShip = findViewById(R.id.carrier);
                         carrierShip.setVisibility(View.INVISIBLE);
                         Toast.makeText(PrepGameActivity.this, "Din Carrier (5 felter) er nu placeret", Toast.LENGTH_SHORT).show();
+                    }
+                    if(carrierShip.getVisibility() == View.INVISIBLE && battleshipShip.getVisibility() == View.INVISIBLE && submarineShip.getVisibility() == View.INVISIBLE
+                    && cruiserShip.getVisibility() == View.INVISIBLE && destroyerShip.getVisibility() == View.INVISIBLE) {
+                        shipsNotPlaced.setText("Alle dine skibe er nu placeret! Tryk på KLAR");
                     }
                     registeredShips.add(ship);
                     positionSelected=false;
@@ -211,6 +211,10 @@ public class PrepGameActivity extends AppCompatActivity {
             else if(temp.getShipLength() == 5) {
                 carrierShip.setVisibility(View.VISIBLE);
                 Toast.makeText(getApplicationContext(),"Din Carrier (5 felter) er nu slettet", Toast.LENGTH_SHORT).show();
+            }
+            if(carrierShip.getVisibility() == View.INVISIBLE || battleshipShip.getVisibility() == View.INVISIBLE || submarineShip.getVisibility() == View.INVISIBLE
+            || cruiserShip.getVisibility() == View.INVISIBLE || destroyerShip.getVisibility() == View.INVISIBLE) {
+                shipsNotPlaced.setText("Disse skibe mangler at blive placeret:");
             }
             model.deleteShip(temp.getCoords());
             registeredShips.remove(temp);
