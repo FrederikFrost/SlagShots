@@ -11,13 +11,11 @@ public class PrepGameAdapter extends BaseAdapter {
     private Context mContext;
     private GameModel model;
     private int selectedPosition = -1;
-    private boolean isPlayerOne;
 
 
-    public PrepGameAdapter(Context c, GameModel model, boolean isPlayerOne) {
+    public PrepGameAdapter(Context c, GameModel model) {
         mContext = c;
         this.model = model;
-        this.isPlayerOne = isPlayerOne;
     }
 
     @Override
@@ -49,7 +47,6 @@ public class PrepGameAdapter extends BaseAdapter {
 
         if (convertView == null) {
             imageView = new SquareImageView(mContext);
-            //imageView.setPadding(0, 2, 0, 2);
         } else {
             imageView = (SquareImageView) convertView;
         }

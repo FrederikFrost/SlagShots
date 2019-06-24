@@ -41,7 +41,7 @@ public class PrepGameActivity extends AppCompatActivity {
         model = new GameModel(isPlayerOne);
 
         GridView gridView = (GridView) findViewById(R.id.gridView3);
-        mAdapter = new PrepGameAdapter(this, model, isPlayerOne);
+        mAdapter = new PrepGameAdapter(this, model);
         gridView.setAdapter(mAdapter);
 
 
@@ -199,7 +199,7 @@ public class PrepGameActivity extends AppCompatActivity {
         //checking placement
         if (!notEqual || !((sameRow && rowDis) || (sameCol && colDis))) {
             Log.i("Place", "Positionen er ikke godkendt i legalPosition");
-            Toast.makeText(getApplicationContext(), "Dette skib er allerede placeret, eller også har du placeret det forkert", Toast.LENGTH_SHORT).show();
+            //Toast.makeText(getApplicationContext(), "Dette skib er allerede placeret, eller også har du placeret det forkert", Toast.LENGTH_SHORT).show();
             return false;
         } else { //
             int shipLength = getShipLength(lastPos, chosenPos);
