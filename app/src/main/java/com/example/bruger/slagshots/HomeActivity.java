@@ -95,7 +95,7 @@ public class HomeActivity extends AppCompatActivity {
                         inputName = editText.getText().toString();
                         if (inputName != null && !inputName.trim().equals(("")) && !inputName.substring(0,1).equals(" ")) {
                             dialog.dismiss();
-                            TextView nameView = (TextView) findViewById(R.id.nameView);
+                            TextView nameView = findViewById(R.id.nameView);
                             nameView.setText(getResources().getString(R.string.title_activity_username) + "   " + inputName);
                         } else if (inputName == null || inputName.trim().equals("") ||  inputName.substring(0,1).equals(" ")) {
                             Toast.makeText(getApplicationContext(), "Dit navn må ikke være tomt eller starte med et mellemrum", Toast.LENGTH_SHORT).show();
@@ -132,12 +132,10 @@ public class HomeActivity extends AppCompatActivity {
     }
 
     private void opretSpil(){
-        Intent intent = new Intent(HomeActivity.this,PrepGameActivity.class);
+        Intent intent = new Intent(HomeActivity.this,NewGameActivity.class);
         intent.putExtra("inputName",inputName);
         intent.putExtra("isPlayerOne",true);
         startActivity(intent);
-
-
     }
 
     private void joinSpil(){
