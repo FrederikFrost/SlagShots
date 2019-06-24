@@ -16,4 +16,5 @@
     <string name="title_activity_change_name">SKIFT NAVN</string>
     <string name="title_activity_give_code">(GIV DENNE KODE TIL DIN VEN)</string>
     <string name="title_activity_prep_game">PrepGameActivity</string>
+    <string name="title_activity_instruction">InstructionActivity</string>
 </resources>

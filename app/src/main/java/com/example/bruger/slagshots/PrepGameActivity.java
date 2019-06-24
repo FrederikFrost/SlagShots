@@ -1,16 +1,25 @@
 package com.example.bruger.slagshots;
 
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
+import android.preference.DialogPreference;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
+import android.view.Gravity;
 import android.view.View;
+import android.view.ViewGroup;
+import android.view.WindowManager;
 import android.widget.AdapterView;
 import android.widget.Button;
 import android.widget.GridView;
 import android.widget.Toast;
 
 import java.util.ArrayList;
+import android.widget.ImageView;
+import android.widget.TextView;
+import android.widget.Toast;
 
 public class PrepGameActivity extends AppCompatActivity {
 
@@ -49,6 +58,7 @@ public class PrepGameActivity extends AppCompatActivity {
         });
 
     }
+}
 
     private void gridViewControl(int position) {
         Log.i("Place","\n\nStarter action\n");

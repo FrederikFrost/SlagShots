@@ -11,8 +11,9 @@ import java.util.ArrayList;
 
 public class GameModel {
 
-    public BoardField[] playerOne;
-    public BoardField[] playerTwo;
+    public BoardField[] playerTwoBoard;
+    public BoardField[] playerOneBoard;
+
     public final String TAG = "DEBUGGER";
     public final String DEBUGGER_STRING = "This object is null!";
     private boolean isPlayerOne;
@@ -21,28 +22,28 @@ public class GameModel {
     public GameModel(boolean isPlayerOne) {
         this.isPlayerOne = isPlayerOne;
         Log.i(TAG, "I made it in the GameModel constructer");
-        playerOne = new BoardField[100];
-        createBoardField(playerOne);
-        //getTestBoard(playerOne);
-        playerTwo = new BoardField[100];
-        createBoardField(playerTwo);
-        //getTestBoard2(playerTwo);
+        playerTwoBoard = new BoardField[100];
+        createBoardField(playerTwoBoard);
+        getTestBoard(playerTwoBoard);
+        playerOneBoard = new BoardField[100];
+        createBoardField(playerOneBoard);
+        getTestBoard2(playerOneBoard);
     }
 
     public int getCount() {
-        return playerOne.length;
+        return playerTwoBoard.length;
     }
 
     public BoardField getBoardfieldAtPosition(int pos) {
-        return isPlayerOne ? playerOne[pos]:playerTwo[pos];
+        return isPlayerOne ? playerOneBoard[pos]: playerTwoBoard[pos];
     }
 
     public void setBoardfieldAtPosition(BoardField boardField, int pos) {
         Log.i(TAG,"I set a boardfield");
         if (isPlayerOne){
-            playerOne[pos] = boardField;
+            playerOneBoard[pos] = boardField;
         } else {
-            playerTwo[pos] = boardField;
+            playerTwoBoard[pos] = boardField;
         }
     }
 
@@ -55,6 +56,8 @@ public class GameModel {
 
     public void getTestBoard(BoardField[] board) {
         board[3].hit();
+        board[12].setShip(true);
+        board[13].setShip(true);
         board[14].setShip(true);
         board[15].setShip(true);
         board[15].hit();
@@ -63,6 +66,8 @@ public class GameModel {
 
     public void getTestBoard2(BoardField[] board) {
             board[55].hit();
+            board[1].setShip(true);
+            board[2].setShip(true);
             board[12].setShip(true);
             board[19].setShip(true);
             board[19].hit();
@@ -71,7 +76,7 @@ public class GameModel {
 
     public int getView(int pos) {
 
-        BoardField boardField = isPlayerOne ? playerOne[pos]:playerTwo[pos];
+        BoardField boardField = isPlayerOne ? playerOneBoard[pos]: playerTwoBoard[pos];
         if (boardField == null) {
             Log.i(TAG,DEBUGGER_STRING);
         }
@@ -93,7 +98,7 @@ public class GameModel {
     public boolean addShip(int start, int end) {
         //TODO: add ship
         Log.i("Place", "Skibet placeres");
-        BoardField[] board = isPlayerOne? playerOne:playerTwo; //TODO: Maybe change this..?
+        BoardField[] board = isPlayerOne? playerOneBoard:playerTwoBoard; //TODO: Maybe change this..?
         ArrayList<BoardField> ship = new ArrayList<BoardField>();
         boolean row = Math.abs(start - end) < 10;
         int count = row ? 1:10;
@@ -143,7 +148,7 @@ public class GameModel {
         for (int i=0; i<100; i=i+10){
             String msg = "";
             for (int e=0; e<10; e++){
-                msg = msg + (playerTwo[i+e].toString()+" ");
+                msg = msg + (playerOneBoard[i+e].toString()+" ");
             }
 
             Log.i("Oliver",msg);
