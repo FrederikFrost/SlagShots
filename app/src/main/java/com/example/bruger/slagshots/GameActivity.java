@@ -139,7 +139,7 @@ public class GameActivity extends AppCompatActivity {
         checkInTwo = mGameroom.child("CheckInTwo");
 
         //sets turn variable
-        mGameroom.child("Turn").setValue(1);
+        mGameroom.child("Turn").setValue(0);
         mGameroom.child("PlayerOnesBoard");
         mGameroom.child("PlayerTwosBoard");
 
@@ -159,11 +159,17 @@ public class GameActivity extends AppCompatActivity {
         if (!bothConnected) {
             progressDialog = new ProgressDialog(this);
             // Setting Title
-            progressDialog.setTitle("");
-            progressDialog.setMessage("Venter på din modstander...");
+            progressDialog.setTitle("Venter på modstanderen");
+            progressDialog.setMessage("Du kan aflyse spillet ved at trykke på tilbage knappen");
             progressDialog.setProgressStyle(ProgressDialog.STYLE_HORIZONTAL);
             progressDialog.setProgressStyle(ProgressDialog.STYLE_SPINNER);
-            progressDialog.setCancelable(false);
+            progressDialog.setCanceledOnTouchOutside(false);
+            progressDialog.setOnCancelListener(new DialogInterface.OnCancelListener() {
+                public void onCancel(DialogInterface arg0) {
+                    Log.i("FINISH","Cancel wait finish");
+                    finish();
+                }
+            });
             progressDialog.show(); // Display Progress Dialog
         }
 
@@ -253,6 +259,7 @@ public class GameActivity extends AppCompatActivity {
                 if (progressDialogRunning){
                     progressDialogRunning = false;
                     progressDialog.dismiss();
+                    mGameroom.child("Turn").setValue(1);
                 }
 
                 //checks goal so not to display messages if game has ended
@@ -319,9 +326,10 @@ public class GameActivity extends AppCompatActivity {
                     return;
                 }
 
-                if (progressDialogRunning){
+                if (progressDialogRunning) {
                     progressDialogRunning = false;
                     progressDialog.dismiss();
+                    mGameroom.child("Turn").setValue(1);
                 }
 
                 //checks goal so not to display messages if game has ended
@@ -402,6 +410,7 @@ public class GameActivity extends AppCompatActivity {
                         Toast.makeText(getApplicationContext(), playerOneName[0] +" har vundet!!", Toast.LENGTH_SHORT).show();
                     }
                     gameDone = true;
+                    Log.i("FINISH","Someone won finish");
                     finish();
                 } else if(isPlayersTurn(isPlayerOne)){
                     if (bothConnected) {
@@ -425,11 +434,13 @@ public class GameActivity extends AppCompatActivity {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
 
-                if (dataSnapshot.exists() && dataSnapshot.getValue().toString().equals("TRUE")){
-                    Toast.makeText(getApplicationContext(),"Din modstander har forladt spillet. Lukker ned.", Toast.LENGTH_LONG).show();
-                    playerLeftGame = true;
-
-                    finish();
+                if (!playerLeftGame && !gameDone) {
+                    if (dataSnapshot.exists() && dataSnapshot.getValue().toString().equals("TRUE")) {
+                        Toast.makeText(getApplicationContext(), "Din modstander har forladt spillet. Lukker ned.", Toast.LENGTH_LONG).show();
+                        playerLeftGame = true;
+                        Log.i("FINISH","Modstander har forladt spillet finish");
+                        finish();
+                    }
                 }
             }
 
@@ -502,12 +513,13 @@ public class GameActivity extends AppCompatActivity {
 
     @Override
     public void onBackPressed() {
-        super.onBackPressed();
+        //super.onBackPressed();
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
-        builder.setMessage("Are you sure you want to exit?")
+        builder.setMessage("Er du sikker på at du vil forlade spillet?")
                 .setCancelable(false)
                 .setPositiveButton("Yes", new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int id) {
+                        Log.i("FINISH","Are you sure you wanna exit finish");
                         finish();
                     }
                 })
@@ -536,7 +548,9 @@ public class GameActivity extends AppCompatActivity {
                 @Override
                 public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                     mGameroom.child("PlayerLeftGame").setValue("TRUE");
-                    Toast.makeText(getApplicationContext(), "Du har forladt spillet.", Toast.LENGTH_LONG).show();
+                    if (!gameDone){
+                        Toast.makeText(getApplicationContext(), "Du har forladt spillet.", Toast.LENGTH_LONG).show();
+                    }
                     return;
                 }
 
